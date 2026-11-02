@@ -1,0 +1,13 @@
+{
+  "invoice_number": "INV-2024-1012",
+  "vendor_name": "Cascade Lab Supplies (fictional)",
+  "invoice_date": "2024-10-12",
+  "line_items": [
+    {"description": "Electronics lab supply kit", "quantity": 2, "unit_price": "624.75", "line_total": "1249.50"}
+  ],
+  "subtotal": "1249.50",
+  "tax_amount": "124.95",
+  "total_amount": "1374.45",
+  "currency": "USD",
+  "tax_rate_percent": "10.00"
+}

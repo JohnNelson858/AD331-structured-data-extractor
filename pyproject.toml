@@ -1,0 +1,27 @@
+[project]
+name = "ad331-structured-data-extractor"
+version = "0.1.0"
+description = "Auditable invoice extraction with strict validation and bounded recovery"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "pydantic>=2.12,<3",
+    "openai>=2,<3",
+    "pypdf>=6,<8",
+    "beautifulsoup4>=4.14,<5",
+    "fastapi>=0.115,<1",
+    "uvicorn>=0.30,<1",
+    "python-dotenv>=1,<2",
+    "python-multipart>=0.0.20,<1",
+    "json-repair>=0.50,<1",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "pytest-asyncio>=1,<2", "httpx>=0.28,<1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = ["live: explicitly enabled paid provider integration checks"]
