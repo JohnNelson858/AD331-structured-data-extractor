@@ -69,6 +69,21 @@ and regression evidence. The baseline is not labeled production-ready.
 
 ## Step 3 - audit and corrections
 
+### Preliminary portability finding during Step 2 Dell verification
+
+The Step 2 sample PDF is valid in its original bytes, but the generated project
+omitted a PDF binary rule in Git attributes. On Windows, text-mode checkout can
+convert LF to CRLF and invalidate the PDF's byte offsets. John observed the
+parser recovering with `incorrect startxref pointer(1)` and
+`parsing for Object Streams`, despite all 44 tests passing in 9.30s.
+
+The assistant reproduced both exact warnings by newline-converting the original
+sample. Added `.gitattributes` with `*.pdf binary`, then verified Git's checkout
+filter under core.autocrlf=true preserves the original bytes. John must refresh
+the already-checked-out synthetic fixture and confirm the warning disappears.
+This is a genuine portability defect, preserved as a separate follow-up commit.
+It does not complete the required two-finding engine audit by itself.
+
 Pending. At least two genuine code defects, security gaps, or anti-patterns
 must be identified and refactored with specific evidence and regression checks.
 Inspect v2 API usage, bounded source context, deterministic acceptance and DLQ,

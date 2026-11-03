@@ -1,0 +1,2 @@
+# PDF offsets refer to exact bytes. Never apply Windows line-ending conversion.
+*.pdf binary

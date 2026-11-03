@@ -24,9 +24,34 @@ HTML preprocessing, OCR-required blank-page handling, bounded feedback, refusal
 handling, missing information, conservative repair, and retry limits have initial
 smoke coverage. Full audit, fault coverage, UI and Docker checks remain pending.
 
-## Dell verification
+## Dell verification, November 3, 2026
 
-Pending. In the existing repository folder:
+John's screenshot confirms **44 passed in 9.30s**, reflection success on Attempt
+2, and DLQ_FAILED after 4 calls with a saved runtime/dlq record. Both CLI runs
+also showed `incorrect startxref pointer(1)` and `parsing for Object Streams`.
+
+The assistant reproduced those exact PDF parser warnings by converting the
+checked-in sample's LF bytes to Windows CRLF. The original 1526-byte PDF parses
+without the warnings. It contains no NUL bytes, allowing Git's text heuristics
+to treat it as text unless attributes explicitly forbid conversion.
+
+Portability correction: `.gitattributes` now declares `*.pdf binary`, disabling
+text conversion. Git's Windows checkout filter was checked with core.autocrlf
+enabled and must preserve the original PDF bytes. On an existing checkout,
+pull the attribute rule then regenerate this synthetic sample using:
+
+```powershell
+git pull --ff-only
+uv run python scripts/build_samples.py
+uv run python -m src.cli --demo reflection --summary
+```
+
+Warning-free PDF parsing on the Dell remains pending this refresh. The baseline
+commit is preserved; this is a separate portability fix, not a rewritten baseline.
+
+### Original verification commands
+
+In the existing repository folder:
 
 ```powershell
 git pull --ff-only
