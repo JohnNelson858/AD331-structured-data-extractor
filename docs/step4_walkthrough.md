@@ -109,3 +109,14 @@ QA and Step 6 provides the separate Docker deployment alternative.
 References used for implementation:
 - https://fastapi.tiangolo.com/advanced/custom-response/
 - https://fastapi.tiangolo.com/tutorial/request-files/
+
+
+## Subsequent Dell verification
+
+John's November 3 screenshots now verify the desktop workbench: clean sample,
+Attempt 2 reflection and its exact error/prompt, reflection-off rejection after
+one attempt, four-attempt hard-failure DLQ with saved path, single-attempt
+heuristic repair, and PDF/HTML uploads accepted on the first attempt. These are
+still clearly labeled offline fixtures. See step5_verification.md for the
+consolidated observed results. Separate mobile/download/pasted-HTML visual checks
+and actual paid model extraction are not claimed.

@@ -1,0 +1,49 @@
+diff --git a/src/extractor.py b/src/extractor.py
+index 76f6507..cabfb50 100644
+--- a/src/extractor.py
++++ b/src/extractor.py
+@@ -72,6 +72,21 @@ class SchemaExtractor:
+                 attempts_used=attempts, error_log=errors, events=events,
+                 dlq_path=dlq_path, elapsed_ms=(time.perf_counter() - started) * 1000)
+ 
++        async def pause_before_retry(delay: float, reason: str) -> bool:
++            remaining = self.deadline_seconds - (time.perf_counter() - started)
++            if delay >= remaining:
++                errors.append("execution_deadline_exceeded")
++                event("retry_budget_exhausted", {"reason": reason})
++                return False
++            event("backoff", {"seconds": delay, "reason": reason})
++            try:
++                await asyncio.wait_for(self.sleep(delay), timeout=remaining)
++            except TimeoutError:
++                errors.append("execution_deadline_exceeded")
++                event("retry_budget_exhausted", {"reason": reason})
++                return False
++            return True
++
+         async def fail():
+             try:
+                 target = await asyncio.to_thread(write_dlq, self.dlq_dir, source, raw, attempts, errors, self.model)
+@@ -107,11 +122,8 @@ class SchemaExtractor:
+                 event("provider_error", {"code": code})
+                 if isinstance(exc, ProviderFailure) and exc.transient and attempts < limit:
+                     delay = min(2 ** (attempts - 1) + random.uniform(0, 0.25), 4)
+-                    remaining = self.deadline_seconds - (time.perf_counter() - started)
+-                    if delay >= remaining:
++                    if not await pause_before_retry(delay, "transient_provider_failure"):
+                         break
+-                    event("backoff", {"seconds": delay})
+-                    await self.sleep(delay)
+                     continue
+                 return await fail()
+             raw = reply.content
+@@ -140,6 +152,9 @@ class SchemaExtractor:
+                     correction_requested = True
+                     messages = reflection_messages(SYSTEM_PROMPT, source, raw, issues)
+                     event("reflection_prompt", {"messages": json.loads(safe_text(json.dumps(messages)))})
++                    delay = min(0.25 * 2 ** (attempts - 1), 1.0)
++                    if not await pause_before_retry(delay, "validation_reflection"):
++                        break
+         if repair_allowed:
+             repaired = await asyncio.to_thread(conservative_repair, raw)
+             if repaired is not None:

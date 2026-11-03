@@ -4,10 +4,11 @@ John Nelson - AD 331 Artificial Intelligence - Week 4 hands-on assignment.
 
 Commercial invoice extraction with Pydantic v2, native OpenAI Structured
 Outputs, bounded reflection retries, heuristic repair, and dead-letter queue
-review. **Current milestone: Step 4 web interface implemented and HTTP-tested.**
+review. **Current milestone: Step 5 QA complete offline; Dell test run pending.**
 The provider adapter, ingestion, reflection/repair/DLQ pipeline, CLI, web UI and
-synthetic samples are implemented. All 72 current tests pass offline. Dell browser
-verification, live extraction quality, expanded QA, Docker and video remain pending.
+synthetic samples are implemented. All 108 current tests pass offline. Main UI
+flows are verified on the Dell. The updated Dell test run, actual live extraction,
+Docker and final video remain pending.
 
 ## Architecture and data flow
 
@@ -135,7 +136,9 @@ emitting malformed JSON. `--input samples/vendor_contract.html` exercises HTML.
 allows one call. Errors, refusal, and incomplete output never become success.
 The baseline caps source characters, correction context, response characters,
 output tokens, requests and execution time. Transient failures use backoff with
-jitter. Heuristic repairs allow only fences/trailing commas and must pass full
+jitter. Validation-reflection retries pause 0.25, 0.50 and 1.00 seconds, fitting
+within the remaining deadline; pauses appear in the audit log. Heuristic repairs
+allow only fences/trailing commas and must pass full
 validation. Heuristic recovery has its own explicit status.
 
 DLQ records are written atomically under ignored `runtime/dlq` and include a
@@ -183,5 +186,33 @@ for the source changes. John verified Step 2's 44 tests, reflection/DLQ paths an
 warning-free PDF parsing on the Dell. Step 3 is also verified on Dell: 51 passed in 2.35s, with expected reflection/DLQ
 results. Step 4 adds 21 passing HTTP integration cases. Final output is in
 [step4_test_results.txt](docs/step4_test_results.txt). Browser JavaScript passes
-syntax checking; visual verification on Dell, live provider quality, expanded
-QA, deployment and final video remain pending.
+syntax checking. John subsequently verified the main desktop UI flows on Dell,
+including PDF/HTML upload and all recovery controls. Step 5 expands QA to 108
+passing cases. Actual live provider quality, Docker and final video remain pending.
+
+
+## Automated QA: required cases and failure coverage
+
+```powershell
+uv run pytest -v
+```
+
+Final Step 5 result: **108 passed in 10.81s** in the assistant environment.
+The default suite blocks real socket connections; no key or API credits are used.
+SDK calls use MockTransport, and web tests use in-process ASGITransport. These
+checks verify integration and validation behavior, not live extraction quality.
+
+| Assignment requirement | Test module |
+| --- | --- |
+| Golden sample PDF succeeds on attempt 1 with no errors | tests/test_extraction.py |
+| Zero/negative quantities and negative totals fail schema validation | tests/test_extraction.py |
+| Line totals, subtotal and tax must reconcile | tests/test_extraction.py |
+| Missing currency/ambiguous date self-heals on attempt 2 | tests/test_fallbacks.py |
+| Hard failure after 3 retries produces a durable DLQ record | tests/test_fallbacks.py |
+
+Additional coverage checks retry/deadline boundaries, backoff, refusal/incomplete
+responses, heuristic rejection, DLQ storage failure, credential-shape redaction,
+concurrent requests and cancellation. Tests found and corrected missing
+validation-retry backoff; the before/after results and source diff are recorded.
+See [step5_verification.md](docs/step5_verification.md) for the full mapping,
+measured evidence, Dell UI verification and remaining deployment/video work.

@@ -1,0 +1,43 @@
+.............FF.....................                                     [100%]
+=================================== FAILURES ===================================
+_________________ test_reflection_retries_use_bounded_backoff __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1/test_reflection_retries_use_bo0')
+source_text = 'CASCADE LAB SUPPLIES (fictional training vendor)\nCommercial Invoice: INV-2024-1012\nInvoice date: 12th of Oct, 2024\...ts use a decimal point and commas for thousands.\nSynthetic educational document. No real supplier or customer data.\n'
+sequence_provider = <class 'tests.conftest.SequenceProvider'>
+no_wait = (<function no_wait.<locals>.sleep at 0x7f1420c916c0>, [])
+
+    async def test_reflection_retries_use_bounded_backoff(tmp_path, source_text, sequence_provider, no_wait):
+        provider = sequence_provider('not valid JSON')
+        sleep, delays = no_wait
+        result = await SchemaExtractor(provider, tmp_path, sleeper=sleep).extract_with_retry(source_text)
+        assert result.attempts_used == 4
+>       assert delays == [0.25, 0.5, 1.0]
+E       assert [] == [0.25, 0.5, 1.0]
+E         
+E         Right contains 3 more items, first extra item: 0.25
+E         Use -v to get more diff
+
+tests/test_fallbacks.py:57: AssertionError
+_____________ test_reflection_backoff_respects_remaining_deadline ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1/test_reflection_backoff_respec0')
+source_text = 'CASCADE LAB SUPPLIES (fictional training vendor)\nCommercial Invoice: INV-2024-1012\nInvoice date: 12th of Oct, 2024\...ts use a decimal point and commas for thousands.\nSynthetic educational document. No real supplier or customer data.\n'
+envelope = <function envelope.<locals>.build at 0x7f1420c914e0>
+invoice_data = {'invoice_number': 'INV-2024-1012', 'vendor_name': 'Cascade Lab Supplies (fictional)', 'invoice_date': '2024-10-12', '...: [{'description': 'Electronics lab supply kit', 'quantity': 2, 'unit_price': '624.75', 'line_total': '1249.50'}], ...}
+sequence_provider = <class 'tests.conftest.SequenceProvider'>
+no_wait = (<function no_wait.<locals>.sleep at 0x7f141f045a80>, [])
+
+    async def test_reflection_backoff_respects_remaining_deadline(tmp_path, source_text, envelope, invoice_data, sequence_provider, no_wait):
+        invoice_data['total_amount'] = '1500.00'
+        provider = sequence_provider(envelope(invoice_data))
+        result = await SchemaExtractor(provider, tmp_path, sleeper=no_wait[0], deadline_seconds=0.1).extract_with_retry(source_text)
+>       assert provider.calls == 1
+E       assert 4 == 1
+E        +  where 4 = <tests.conftest.SequenceProvider object at 0x7f141f085990>.calls
+
+tests/test_fallbacks.py:65: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_fallbacks.py::test_reflection_retries_use_bounded_backoff
+FAILED tests/test_fallbacks.py::test_reflection_backoff_respects_remaining_deadline
+2 failed, 34 passed in 0.63s
