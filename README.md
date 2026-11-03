@@ -4,15 +4,16 @@ John Nelson - AD 331 Artificial Intelligence - Week 4 hands-on assignment.
 
 Commercial invoice extraction with Pydantic v2, native OpenAI Structured
 Outputs, bounded reflection retries, heuristic repair, and dead-letter queue
-review. **Current milestone: Step 1, environment and schema definition only.**
-The provider engine, document ingestion, web UI, and Docker deployment are not
-implemented yet. Files with only module docstrings are explicit future-step
-placeholders, not functioning features.
+review. **Current milestone: Step 2 AI-generated baseline, pending Step 3 audit.**
+The provider adapter, document ingestion, reflection/repair/DLQ pipeline, CLI and
+synthetic samples are implemented and smoke-tested offline. Live OpenAI calls,
+the web UI, full QA, and Docker deployment remain unverified or unimplemented.
+`src/app.py` remains an explicit Step 4 placeholder.
 
 ## Architecture and data flow
 
-This diagram is the planned architecture. Only the Pydantic acceptance contract
-is implemented in Step 1.
+This diagram describes the pipeline. CLI output supplies the current display;
+the interactive UI will be added in Step 4.
 
 ```mermaid
 flowchart TD
@@ -45,10 +46,10 @@ uv run pytest -v
 needed. The committed `uv.lock` fixes dependency versions. Do not run `uv init`
 again inside this prepared checkout or create a second nested project.
 
-No key is needed for the Step 1 schema tests. When the provider engine is ready,
+No key is needed for schema tests or the labeled offline demonstrations. Later,
 copy `.env.example` to `.env` and enter a key locally. Never paste credentials
 into chat, commit them, show them in a recording, or print them in a test log.
-API requests are separately billed; no real provider requests run in Step 1.
+API requests are separately billed. Default tests and `--demo` make no paid calls.
 
 ## Current schema specification
 
@@ -106,16 +107,53 @@ uv run pytest -v
 uv run python -c "from src.schemas import InvoiceExtraction; print(InvoiceExtraction.model_json_schema())"
 ```
 
-The web application command and Docker instructions will be added only when
-those features exist. See [assignment_progress.md](docs/assignment_progress.md)
+Step 2 baseline demonstrations (no key, no API charges):
+
+```powershell
+uv run python -m src.cli --demo success --summary
+uv run python -m src.cli --demo reflection --summary
+uv run python -m src.cli --demo dlq --summary
+uv run python -m src.cli --demo heuristic --no-reflection --summary
+```
+
+Omit `--summary` to see raw responses, exact correction messages, structured
+Pydantic errors (`loc`, `msg`, `type`), and stage events. Simulations use fixed
+responses and fault injection, clearly labeled in the CLI. They demonstrate the
+pipeline logic, not model extraction quality or a schema-constrained provider
+emitting malformed JSON. `--input samples/vendor_contract.html` exercises HTML.
+
+`max_retries=3` allows one initial call plus three more. Reflection disabled
+allows one call. Errors, refusal, and incomplete output never become success.
+The baseline caps source characters, correction context, response characters,
+output tokens, requests and execution time. Transient failures use backoff with
+jitter. Heuristic repairs allow only fences/trailing commas and must pass full
+validation. Heuristic recovery has its own explicit status.
+
+DLQ records are written atomically under ignored `runtime/dlq` and include a
+source hash/excerpt, failed payload, versions, attempts, and errors. Common API
+key shapes are redacted, but this is not general PII anonymization. Use only the
+synthetic samples for recordings. A storage failure returns `DLQ_WRITE_FAILED`
+rather than claiming the record was saved. Local privacy and deployment-volume
+policies need review in subsequent steps.
+
+PDF input supports text layers, at most 5 MB and 10 pages. Pages without usable
+text are rejected with an OCR-required explanation. HTML scripts/styles are
+removed without executing code, fetching URLs, or treating that removal as a
+prompt-injection security guarantee. Native decoding uses `json_schema` and
+`strict: true`; provider wire models remain separate from business validators.
+
+The web application command and Docker instructions will be added when those
+features exist. See [assignment_progress.md](docs/assignment_progress.md)
 for the full rubric mapping and [step1_verification.md](docs/step1_verification.md)
 for checks and the pending Dell verification.
 
 ## AI audit log summary
 
 The student provided the assignment and requested one-step-at-a-time support.
-ChatGPT/Codex created this Step 1 schema and scaffolding. The actual user
+ChatGPT/Codex created the schema and Step 2 baseline. The actual user
 instructions and design decisions are recorded in [ai_prompt_log.md](ai_prompt_log.md).
-Step 2 will preserve the generated extractor baseline before Step 3 records
-genuine audit findings, corrections, and regression evidence. No audit bugs,
-live extraction, student review, or deployment results are claimed in advance.
+The Step 2 Git commit preserves the generated baseline before Step 3 records
+genuine findings, corrections, and regression evidence. Step 1 was verified on
+the Dell: Python 3.11.17, 32 passed in 1.03s. Step 2 smoke checks passed in the
+assistant environment: 44 tests. Live extraction and deployment remain pending.
+See [step2_verification.md](docs/step2_verification.md) for exact scope and results.

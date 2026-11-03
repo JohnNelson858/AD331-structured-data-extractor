@@ -6,8 +6,8 @@ implementation steps. Only Step 1 is being delivered at this milestone.
 | Rubric criterion | Evidence / planned check | Current status |
 | --- | --- | --- |
 | 1. Nested Pydantic v2 models, regex/bounds/enums, monetary/date handling, reconciliation (20) | src/schemas.py; tests/test_schemas.py | Implemented; Dell human verification pending |
-| 2. Native strict decoding and messy PDF/HTML ingestion (20) | Step 2 engine, source samples, provider request tests | Pending |
-| 3. Reflection errors, exact bounds/backoff, json_repair and durable DLQ (20) | Step 2 baseline, Step 3 audit, Step 5 tests | Pending |
+| 2. Native strict decoding and messy PDF/HTML ingestion (20) | Step 2 engine, source samples, real SDK request under MockTransport | Baseline implemented; live provider verification pending |
+| 3. Reflection errors, exact bounds/backoff, json_repair and durable DLQ (20) | Step 2 baseline and smoke tests | Baseline paths pass offline; rigorous Step 3 audit and Step 5 QA pending |
 | 4. Actual prompt/baseline and at least two genuine corrected findings (15) | ai_prompt_log.md; preserved baseline; diff + regression evidence | Log started; extractor audit pending |
 | 5. At least five tests covering golden document, rejection, reconciliation, Attempt 2 recovery and three-retry DLQ (10) | tests/test_extraction.py and tests/test_fallbacks.py | Schema checks only now; full suite pending |
 | 6. Responsive UI with side-by-side source/JSON, badge, events/prompts and failure button (15, shared with video) | Step 4 UI and browser verification | Pending |
@@ -16,8 +16,10 @@ implementation steps. Only Step 1 is being delivered at this milestone.
 ## Six implementation steps
 
 - [x] Step 1 code: project scaffolding and acceptance schema.
-- [ ] Step 1: student reviews policy and verifies locked environment on Dell.
-- [ ] Step 2: generate and preserve baseline provider engine, ingestion, and recovery.
+- [x] Step 1: locked environment verified on Dell, 32 passed in 1.03s.
+- [ ] Step 1: student confirms review of the schema's monetary/date policy.
+- [x] Step 2: generate and preserve baseline provider engine, ingestion, and recovery.
+- [ ] Step 2: student pulls and checks baseline on Dell.
 - [ ] Step 3: audit at least two legitimate flaws and verify corrections.
 - [ ] Step 4: build and verify interactive web UI.
 - [ ] Step 5: complete structured QA with all required success/failure paths.

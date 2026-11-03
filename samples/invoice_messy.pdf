@@ -1,0 +1,104 @@
+%PDF-1.3
+%‚„œ”
+1 0 obj
+<<
+/Producer (pypdf)
+/Title (Synthetic commercial invoice INV\0552024\0551012)
+/Author (John Nelson \055 AD 331)
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Count 1
+/Kids [ 4 0 R ]
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+4 0 obj
+<<
+/Type /Page
+/Resources <<
+/Font <<
+/F1 5 0 R
+>>
+>>
+/MediaBox [ 0.0 0.0 612 792 ]
+/Parent 2 0 R
+/Contents 6 0 R
+>>
+endobj
+5 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Courier
+>>
+endobj
+6 0 obj
+<<
+/Length 805
+>>
+stream
+BT
+/F1 10 Tf
+15 TL
+40 740 Td
+(CASCADE LAB SUPPLIES \(fictional training vendor\)) Tj
+T*
+(Commercial Invoice: INV-2024-1012) Tj
+T*
+(Invoice date: 12th of Oct, 2024) Tj
+T*
+(Bill to: North Sound Teaching Lab \(fictional\)) Tj
+T*
+(  101 Example Avenue) Tj
+T*
+(  Seattle, WA 98103) Tj
+T*
+() Tj
+T*
+(Description                      Qty   Unit price   Line total) Tj
+T*
+(Electronics lab supply kit        2      $624.75    $1,249.50) Tj
+T*
+() Tj
+T*
+(Subtotal                                      USD 1,249.50) Tj
+T*
+(Sales tax \(10%\)                                    $124.95) Tj
+T*
+(TOTAL DUE                                       $1,374.45) Tj
+T*
+(Currency: USD) Tj
+T*
+(Amounts use a decimal point and commas for thousands.) Tj
+T*
+(Synthetic educational document. No real supplier or customer data.) Tj
+T*
+ET
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000015 00000 n 
+0000000146 00000 n 
+0000000205 00000 n 
+0000000254 00000 n 
+0000000386 00000 n 
+0000000454 00000 n 
+trailer
+<<
+/Size 7
+/Root 3 0 R
+/Info 1 0 R
+>>
+startxref
+1310
+%%EOF

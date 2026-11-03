@@ -1,0 +1,16 @@
+CASCADE LAB SUPPLIES (fictional training vendor)
+Commercial Invoice: INV-2024-1012
+Invoice date: 12th of Oct, 2024
+Bill to: North Sound Teaching Lab (fictional)
+  101 Example Avenue
+  Seattle, WA 98103
+
+Description                      Qty   Unit price   Line total
+Electronics lab supply kit        2      $624.75    $1,249.50
+
+Subtotal                                      USD 1,249.50
+Sales tax (10%)                                    $124.95
+TOTAL DUE                                       $1,374.45
+Currency: USD
+Amounts use a decimal point and commas for thousands.
+Synthetic educational document. No real supplier or customer data.

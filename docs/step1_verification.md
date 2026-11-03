@@ -19,7 +19,8 @@ No provider requests, web UI, or Docker tests are part of this step.
 
 ## Dell verification
 
-Pending John running these from the new repository folder in PowerShell:
+Verified by John's November 3, 2026 screenshots from the new repository folder
+in PowerShell on Windows:
 
 ```powershell
 uv sync --locked
@@ -27,5 +28,6 @@ uv run python --version
 uv run pytest -v
 ```
 
-Expected: Python 3.11.x and the schema tests all passing. No .env or API key is
-needed yet. Share the final pytest summary before proceeding to Step 2.
+Observed Python **3.11.17** and **32 passed in 1.03s**. The uv hardlink warning
+fell back to copying and did not block installation or tests. No .env or API key
+was needed. This verifies Step 1 on the Dell; it does not verify live extraction.

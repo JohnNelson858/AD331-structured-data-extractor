@@ -1,0 +1,3 @@
+This is a synthetic equipment-room reminder, not an invoice.
+Please put away the soldering tools after the lab closes.
+There is no invoice number, vendor, date, quantity, currency or total here.

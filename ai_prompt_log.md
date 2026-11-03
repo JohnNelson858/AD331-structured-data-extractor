@@ -41,13 +41,31 @@ Assistant verification: 32 schema tests passed. See
 This is not a substitute for the student's review or Dell verification.
 
 - [ ] John has reviewed the schema and monetary/date policy.
-- [ ] John has cloned this repository on the Dell and run the Step 1 checks.
+- [x] John cloned this repository on the Dell and ran Step 1 checks: Python
+  3.11.17, 32 passed in 1.03s, verified from November 3 screenshots.
 
 ## Step 2 - baseline extraction generation
 
-Pending. Preserve the actual generated baseline in Git before auditing.
-Do not fabricate a separate prompt, intentionally insert bugs, or manufacture
-before/after test failures for the video.
+Actual user instruction: **"Proceed with Step 2."** The original assignment and
+its sample prompt remain the preceding conversation context. ChatGPT/Codex
+generated this baseline directly; there was no separate external AI invocation.
+See `docs/step2_generation_prompt.md` for provenance and implementation scope.
+
+Generated modules: native strict provider adapter and wire schema, PDF/HTML/text
+ingestion, SchemaExtractor orchestration, reflection/repair/DLQ helpers, result
+metadata, CLI, synthetic samples and offline smoke tests. The Step 2 Git commit
+preserves the baseline before Step 3. It must not be retroactively rewritten to
+manufacture audit evidence.
+
+Assistant verification: initial **44 passed in 1.89s**, final verbose run
+**44 passed in 1.09s** (32 existing schema cases plus
+12 baseline cases), using fixture responses or SDK MockTransport only. CLI
+success, Attempt 2 reflection, bounded DLQ, and conservative heuristic repair
+were also exercised. No live provider call or student baseline review is claimed.
+
+No deliberately inserted defects or fabricated failing results are used.
+Step 3 will review this actual baseline and record genuine findings with diffs
+and regression evidence. The baseline is not labeled production-ready.
 
 ## Step 3 - audit and corrections
 
