@@ -1,0 +1,63 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.17, pytest-9.2.0, pluggy-1.7.0 -- /workspace/scratch/5c42f2842342/AD331-structured-data-extractor/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /workspace/scratch/5c42f2842342/AD331-structured-data-extractor
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.16.0, asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 51 items
+
+tests/test_audit_regressions.py::test_root_error_keeps_header_middle_and_tail_evidence PASSED [  1%]
+tests/test_audit_regressions.py::test_field_error_does_not_discard_other_required_facts PASSED [  3%]
+tests/test_audit_regressions.py::test_observer_failure_does_not_crash_extraction_or_dlq[success-SUCCESS] PASSED [  5%]
+tests/test_audit_regressions.py::test_observer_failure_does_not_crash_extraction_or_dlq[dlq-DLQ_FAILED] PASSED [  7%]
+tests/test_audit_regressions.py::test_observer_cannot_mutate_retained_audit_events PASSED [  9%]
+tests/test_audit_regressions.py::test_observer_cancellation_still_propagates PASSED [ 11%]
+tests/test_audit_regressions.py::test_long_source_reflection_dispatches_needed_evidence PASSED [ 13%]
+tests/test_baseline.py::test_offline_baseline_paths[success-SUCCESS-1] PASSED [ 15%]
+tests/test_baseline.py::test_offline_baseline_paths[reflection-REPAIRED_VIA_REFLECTION-2] PASSED [ 17%]
+tests/test_baseline.py::test_offline_baseline_paths[heuristic-REPAIRED_VIA_HEURISTIC-4] PASSED [ 19%]
+tests/test_baseline.py::test_offline_baseline_paths[dlq-DLQ_FAILED-4] PASSED [ 21%]
+tests/test_baseline.py::test_reflection_disabled_means_one_call PASSED   [ 23%]
+tests/test_baseline.py::test_html_preprocessing_preserves_invoice_and_removes_scripts PASSED [ 25%]
+tests/test_baseline.py::test_scan_without_text_is_explicitly_rejected PASSED [ 27%]
+tests/test_baseline.py::test_reflection_context_is_bounded_and_not_accumulated PASSED [ 29%]
+tests/test_baseline.py::test_heuristic_rejects_truncation_and_preserves_string_commas PASSED [ 31%]
+tests/test_baseline.py::test_provider_refusal_stops_without_heuristic PASSED [ 33%]
+tests/test_baseline.py::test_missing_source_information_is_not_retried PASSED [ 35%]
+tests/test_baseline.py::test_real_sdk_request_uses_native_strict_schema_with_mock_http PASSED [ 37%]
+tests/test_schemas.py::test_valid_invoice_and_decimal_roundtrip PASSED   [ 39%]
+tests/test_schemas.py::test_documented_date_currency_and_percent_normalization PASSED [ 41%]
+tests/test_schemas.py::test_reject_invalid_or_coerced_quantities[0] PASSED [ 43%]
+tests/test_schemas.py::test_reject_invalid_or_coerced_quantities[-1] PASSED [ 45%]
+tests/test_schemas.py::test_reject_invalid_or_coerced_quantities[True] PASSED [ 47%]
+tests/test_schemas.py::test_reject_invalid_or_coerced_quantities[2] PASSED [ 49%]
+tests/test_schemas.py::test_reject_invalid_or_coerced_quantities[2.0] PASSED [ 50%]
+tests/test_schemas.py::test_reject_invalid_or_coerced_quantities[1000001] PASSED [ 52%]
+tests/test_schemas.py::test_reject_invalid_monetary_values[-1] PASSED    [ 54%]
+tests/test_schemas.py::test_reject_invalid_monetary_values[NaN] PASSED   [ 56%]
+tests/test_schemas.py::test_reject_invalid_monetary_values[Infinity] PASSED [ 58%]
+tests/test_schemas.py::test_reject_invalid_monetary_values[True] PASSED  [ 60%]
+tests/test_schemas.py::test_reject_invalid_monetary_values[1.249,50] PASSED [ 62%]
+tests/test_schemas.py::test_reject_invalid_monetary_values[1,24.50] PASSED [ 64%]
+tests/test_schemas.py::test_reject_invalid_monetary_values[1.234] PASSED [ 66%]
+tests/test_schemas.py::test_reject_invalid_monetary_values[1000000001] PASSED [ 68%]
+tests/test_schemas.py::test_reject_ambiguous_or_invalid_dates[12/10/2024] PASSED [ 70%]
+tests/test_schemas.py::test_reject_ambiguous_or_invalid_dates[2024-02-30] PASSED [ 72%]
+tests/test_schemas.py::test_reject_ambiguous_or_invalid_dates[2024-1-2] PASSED [ 74%]
+tests/test_schemas.py::test_reject_ambiguous_or_invalid_dates[12th of Octopus, 2024] PASSED [ 76%]
+tests/test_schemas.py::test_reject_ambiguous_or_invalid_dates[2024-10-12T00:00:00] PASSED [ 78%]
+tests/test_schemas.py::test_reject_contract_and_reconciliation_failures[subtotal-1240.00] PASSED [ 80%]
+tests/test_schemas.py::test_reject_contract_and_reconciliation_failures[total_amount-1400.00] PASSED [ 82%]
+tests/test_schemas.py::test_reject_contract_and_reconciliation_failures[tax_rate_percent-15%] PASSED [ 84%]
+tests/test_schemas.py::test_reject_contract_and_reconciliation_failures[currency-CAD] PASSED [ 86%]
+tests/test_schemas.py::test_reject_contract_and_reconciliation_failures[invoice_number-../secret path] PASSED [ 88%]
+tests/test_schemas.py::test_reject_bad_line_arithmetic PASSED            [ 90%]
+tests/test_schemas.py::test_reject_unknown_fields PASSED                 [ 92%]
+tests/test_schemas.py::test_reject_mismatched_currency_symbol PASSED     [ 94%]
+tests/test_schemas.py::test_exact_reconciliation_tolerance[0.02-True] PASSED [ 96%]
+tests/test_schemas.py::test_exact_reconciliation_tolerance[0.03-False] PASSED [ 98%]
+tests/test_schemas.py::test_nested_schema_has_closed_objects_and_quantity_bound PASSED [100%]
+
+============================== 51 passed in 1.32s ==============================

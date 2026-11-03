@@ -1,0 +1,117 @@
+FFFFF.                                                                   [100%]
+=================================== FAILURES ===================================
+____________ test_root_error_keeps_header_middle_and_tail_evidence _____________
+
+    def test_root_error_keeps_header_middle_and_tail_evidence():
+        source = ("Invoice INV-AUDIT-42; Vendor Cascade Labs\n" + "general terms\n" * 550
+                  + "Line items: two sensors at 624.75 each\n" + "general terms\n" * 550
+                  + "Subtotal 1249.50; Tax 124.95; Grand total 1374.45 USD")
+        messages = reflection_messages(SYSTEM_PROMPT, source, "{}", [
+            {"loc": [], "msg": "line totals do not reconcile", "type": "value_error"}])
+        payload = json.loads(messages[1]["content"])
+        evidence = payload["source_excerpt"]
+>       assert "Grand total 1374.45" in evidence
+E       AssertionError: assert 'Grand total 1374.45' in 'Invoice INV-AUDIT-42; Vendor Cascade Labs\ngeneral terms\ngeneral terms\ngeneral terms\ngeneral terms\ngeneral terms\...rms\ngeneral terms\ngeneral terms\ngeneral terms\ngeneral terms\ngeneral terms\ngeneral terms\ngeneral terms\ngeneral '
+
+tests/test_audit_regressions.py:20: AssertionError
+____________ test_field_error_does_not_discard_other_required_facts ____________
+
+    def test_field_error_does_not_discard_other_required_facts():
+        source = "Invoice INV-AUDIT-43\nVendor Cascade Labs\nCurrency USD\nTotal 1374.45"
+        payload = json.loads(reflection_messages(SYSTEM_PROMPT, source, "{}", [
+            {"loc": ["currency"], "msg": "bad currency", "type": "literal_error"}])[1]["content"])
+>       assert source == payload["source_excerpt"]
+E       AssertionError: assert 'Invoice INV-...Total 1374.45' == 'Currency USD'
+E         
+E         + Invoice INV-AUDIT-43
+E         + Vendor Cascade Labs
+E         - Currency USD
+E         + Currency USD
+E         ?             +
+E         + Total 1374.45
+
+tests/test_audit_regressions.py:30: AssertionError
+___ test_observer_failure_does_not_crash_extraction_or_dlq[success-SUCCESS] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_observer_failure_does_not0')
+scenario = 'success', status = 'SUCCESS'
+
+    @pytest.mark.parametrize("scenario,status", [("success", "SUCCESS"), ("dlq", "DLQ_FAILED")])
+    async def test_observer_failure_does_not_crash_extraction_or_dlq(tmp_path, scenario, status):
+        calls = []
+        def broken_observer(event):
+            calls.append(event.stage)
+            raise RuntimeError("private-observer-detail-must-not-leak")
+>       result = await SchemaExtractor(FixtureProvider(scenario), tmp_path).extract_with_retry(
+            "Synthetic invoice source", on_event=broken_observer)
+
+tests/test_audit_regressions.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/extractor.py:90: in extract_with_retry
+    event("provider_request", {"messages": json.loads(safe_text(json.dumps(messages))), "strict_schema": True})
+src/extractor.py:57: in event
+    on_event(item)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+event = AuditEvent(stage='provider_request', attempt=1, detail={'messages': [{'role': 'system', 'content': 'Extract one commer...or modify records.'}, {'role': 'user', 'content': '{"document": "Synthetic invoice source"}'}], 'strict_schema': True})
+
+    def broken_observer(event):
+        calls.append(event.stage)
+>       raise RuntimeError("private-observer-detail-must-not-leak")
+E       RuntimeError: private-observer-detail-must-not-leak
+
+tests/test_audit_regressions.py:38: RuntimeError
+____ test_observer_failure_does_not_crash_extraction_or_dlq[dlq-DLQ_FAILED] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_observer_failure_does_not1')
+scenario = 'dlq', status = 'DLQ_FAILED'
+
+    @pytest.mark.parametrize("scenario,status", [("success", "SUCCESS"), ("dlq", "DLQ_FAILED")])
+    async def test_observer_failure_does_not_crash_extraction_or_dlq(tmp_path, scenario, status):
+        calls = []
+        def broken_observer(event):
+            calls.append(event.stage)
+            raise RuntimeError("private-observer-detail-must-not-leak")
+>       result = await SchemaExtractor(FixtureProvider(scenario), tmp_path).extract_with_retry(
+            "Synthetic invoice source", on_event=broken_observer)
+
+tests/test_audit_regressions.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/extractor.py:90: in extract_with_retry
+    event("provider_request", {"messages": json.loads(safe_text(json.dumps(messages))), "strict_schema": True})
+src/extractor.py:57: in event
+    on_event(item)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+event = AuditEvent(stage='provider_request', attempt=1, detail={'messages': [{'role': 'system', 'content': 'Extract one commer...or modify records.'}, {'role': 'user', 'content': '{"document": "Synthetic invoice source"}'}], 'strict_schema': True})
+
+    def broken_observer(event):
+        calls.append(event.stage)
+>       raise RuntimeError("private-observer-detail-must-not-leak")
+E       RuntimeError: private-observer-detail-must-not-leak
+
+tests/test_audit_regressions.py:38: RuntimeError
+______________ test_observer_cannot_mutate_retained_audit_events _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_observer_cannot_mutate_re0')
+
+    async def test_observer_cannot_mutate_retained_audit_events(tmp_path):
+        def mutating_observer(event):
+            event.stage = "forged"
+            event.detail.clear()
+        result = await SchemaExtractor(FixtureProvider("success"), tmp_path).extract_with_retry(
+            "Synthetic invoice source", on_event=mutating_observer)
+>       assert result.events[0].stage == "provider_request"
+E       AssertionError: assert 'forged' == 'provider_request'
+E         
+E         - provider_request
+E         + forged
+
+tests/test_audit_regressions.py:56: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_audit_regressions.py::test_root_error_keeps_header_middle_and_tail_evidence
+FAILED tests/test_audit_regressions.py::test_field_error_does_not_discard_other_required_facts
+FAILED tests/test_audit_regressions.py::test_observer_failure_does_not_crash_extraction_or_dlq[success-SUCCESS]
+FAILED tests/test_audit_regressions.py::test_observer_failure_does_not_crash_extraction_or_dlq[dlq-DLQ_FAILED]
+FAILED tests/test_audit_regressions.py::test_observer_cannot_mutate_retained_audit_events
+5 failed, 1 passed in 0.91s

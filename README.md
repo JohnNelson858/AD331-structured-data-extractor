@@ -4,7 +4,7 @@ John Nelson - AD 331 Artificial Intelligence - Week 4 hands-on assignment.
 
 Commercial invoice extraction with Pydantic v2, native OpenAI Structured
 Outputs, bounded reflection retries, heuristic repair, and dead-letter queue
-review. **Current milestone: Step 2 AI-generated baseline, pending Step 3 audit.**
+review. **Current milestone: Step 3 audit and corrections complete offline.**
 The provider adapter, document ingestion, reflection/repair/DLQ pipeline, CLI and
 synthetic samples are implemented and smoke-tested offline. Live OpenAI calls,
 the web UI, full QA, and Docker deployment remain unverified or unimplemented.
@@ -94,8 +94,8 @@ Cross-field validators independently check, with **inclusive 0.02 tolerance**:
 
 Real multi-rate taxes, discounts, locale-specific rounding, and fractional
 quantities require a new explicit domain policy. These models establish an
-acceptance contract, not proof of source accuracy. A later provider wire schema
-will use its supported strict subset and feed this richer business validator.
+acceptance contract, not proof of source accuracy. The provider wire schema
+uses its supported strict subset and feeds this richer business validator.
 JSON object mode alone will not be represented as constrained schema decoding.
 
 ## Execution commands
@@ -145,15 +145,24 @@ prompt-injection security guarantee. Native decoding uses `json_schema` and
 The web application command and Docker instructions will be added when those
 features exist. See [assignment_progress.md](docs/assignment_progress.md)
 for the full rubric mapping and [step1_verification.md](docs/step1_verification.md)
-for checks and the pending Dell verification.
+for the verified Step 1 checks on Dell.
 
 ## AI audit log summary
 
 The student provided the assignment and requested one-step-at-a-time support.
 ChatGPT/Codex created the schema and Step 2 baseline. The actual user
 instructions and design decisions are recorded in [ai_prompt_log.md](ai_prompt_log.md).
-The Step 2 Git commit preserves the generated baseline before Step 3 records
-genuine findings, corrections, and regression evidence. Step 1 was verified on
-the Dell: Python 3.11.17, 32 passed in 1.03s. Step 2 smoke checks passed in the
-assistant environment: 44 tests. Live extraction and deployment remain pending.
-See [step2_verification.md](docs/step2_verification.md) for exact scope and results.
+The Step 2 Git commit preserves the generated baseline. The Step 3 audit found
+and corrected two genuine flaws: reflection could discard essential evidence,
+and optional event callbacks could crash extraction or mutate retained audit logs.
+Short documents now remain intact; long excerpts retain bounded header/footer
+and label windows, marked incomplete. Callbacks receive deep copies, and ordinary
+callback failures produce a safe warning without bypassing validation or DLQ.
+
+Six new regression cases produced 5 failures before correction. Final offline
+verification: **51 passed in 1.32s**, including an additional long-document retry
+check. See [step3_verification.md](docs/step3_verification.md) for evidence,
+limitations and Dell commands, and [step3_refactor.diff](docs/step3_refactor.diff)
+for the source changes. John verified Step 2's 44 tests, reflection/DLQ paths and
+warning-free PDF parsing on the Dell. Step 3 Dell verification, the web UI, live
+provider quality, expanded QA, deployment and final video remain pending.

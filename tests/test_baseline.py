@@ -69,7 +69,8 @@ def test_scan_without_text_is_explicitly_rejected():
 def test_reflection_context_is_bounded_and_not_accumulated():
     messages = reflection_messages(SYSTEM_PROMPT, "invoice text " * 5000, "{}", [{"loc": [], "msg": "bad total", "type": "value_error"}])
     assert len(messages) == 2
-    assert len(json.loads(messages[1]["content"])["source_excerpt"]) == 6000
+    assert len(json.loads(messages[1]["content"])["source_excerpt"]) <= 6000
+    assert json.loads(messages[1]["content"])["source_excerpt_incomplete"] is True
 
 
 def test_heuristic_rejects_truncation_and_preserves_string_commas():

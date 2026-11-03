@@ -18,16 +18,61 @@ def safe_text(value: str) -> str:
     return re.sub(r"sk-[A-Za-z0-9_-]{16,}", "[REDACTED_API_KEY]", value)
 
 
+def reflection_evidence(source: str, issues: list[dict]) -> str:
+    """Bounded, explicitly incomplete evidence with original character offsets.
+
+    Keep short documents intact. For long documents preserve both ends plus
+    windows around invoice labels and failing fields; never silently imply that
+    a selected excerpt contains every line item or required fact.
+    """
+    if len(source) <= MAX_FEEDBACK_CHARS:
+        return source
+
+    def render(spans):
+        merged = []
+        for start, end in sorted(spans):
+            if merged and start <= merged[-1][1]:
+                merged[-1] = (merged[-1][0], max(end, merged[-1][1]))
+            else:
+                merged.append((start, end))
+        return "\n\n".join(f"[source chars {start}:{end}]\n" + source[start:end]
+                             for start, end in merged)
+
+    spans = [(0, 1200), (len(source) - 1200, len(source))]
+    terms = list(dict.fromkeys(str(part).replace("_", " ")
+        for issue in issues for part in issue.get("loc", []) if isinstance(part, str)))
+    patterns = [re.escape(term) for term in terms] + [
+        r"\binvoice\b", r"\bvendor\b", r"\bdate\b", r"\bline[ _-]*items?\b",
+        r"\bquantity\b|\bqty\b", r"\bsubtotal\b", r"\btax\b", r"\btotal\b", r"\bcurrency\b",
+    ]
+    # Consider first and last matches per label. Each proposed window must fit
+    # with its offset markers; the budget never grows with document/history size.
+    matches = [list(re.finditer(pattern, source, re.IGNORECASE)) for pattern in patterns]
+    for side in (0, -1):
+        for found in matches:
+            if not found:
+                continue
+            match = found[side]
+            candidate = (max(0, match.start() - 160), min(len(source), match.end() + 240))
+            proposed = spans + [candidate]
+            if len(render(proposed)) <= MAX_FEEDBACK_CHARS:
+                spans = proposed
+    return render(spans)
+
+
 def reflection_messages(system: str, source: str, failed: str, issues: list[dict]) -> list[dict[str, str]]:
     # Rebuild, never append whole documents and history on each iteration.
-    terms = {str(x) for issue in issues for x in issue.get("loc", []) if isinstance(x, str)}
-    relevant = [line for line in source.splitlines() if any(term.replace("_", " ").lower() in line.lower() for term in terms)]
-    evidence = ("\n".join(relevant) if relevant else source)[:MAX_FEEDBACK_CHARS]
+    evidence = reflection_evidence(source, issues)
+    truncated = len(source) > MAX_FEEDBACK_CHARS
     payload = {
         "source_excerpt": evidence,
+        "source_excerpt_incomplete": truncated,
+        "source_characters": len(source),
         "previous_extraction": failed[:MAX_RESPONSE_CHARS],
         "validation_errors": issues,
-        "correction_request": "Re-extract from evidence. Correct only supported values. Never invent absent data; return insufficient_source when needed.",
+        "correction_request": "Re-extract from evidence. Correct only supported values. "
+            "An incomplete excerpt may omit required facts; previous output is not evidence. "
+            "Never invent absent data; return insufficient_source when needed.",
     }
     return [{"role": "system", "content": system}, {"role": "user", "content": json.dumps(payload, ensure_ascii=False)}]
 

@@ -46,8 +46,9 @@ uv run python scripts/build_samples.py
 uv run python -m src.cli --demo reflection --summary
 ```
 
-Warning-free PDF parsing on the Dell remains pending this refresh. The baseline
-commit is preserved; this is a separate portability fix, not a rewritten baseline.
+John refreshed the fixture and supplied a screenshot confirming warning-free
+reflection, Attempt 2, one validation error, and reconciled=true. The baseline
+commit remains preserved; this is a separate portability fix.
 
 ### Original verification commands
 

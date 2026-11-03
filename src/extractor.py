@@ -1,4 +1,4 @@
-"""Step 2 AI-generated baseline. Preserve in Git before the Step 3 audit."""
+"""Audited extraction orchestration; generated baseline is preserved in Git."""
 import asyncio
 import json
 from pathlib import Path
@@ -49,12 +49,23 @@ class SchemaExtractor:
         events, errors = [], []
         attempts, raw, source = 0, "", raw_text
         correction_requested = False
+        observer = on_event
 
         def event(stage, detail):
+            nonlocal observer
             item = AuditEvent(stage=stage, attempt=attempts, detail=detail)
             events.append(item)
-            if on_event:
-                on_event(item)
+            if observer is not None:
+                try:
+                    # UI/telemetry consumers cannot mutate retained evidence.
+                    observer(item.model_copy(deep=True))
+                except Exception:
+                    # Preserve validation/DLQ behavior if an optional consumer
+                    # fails. Cancellation and other BaseExceptions propagate.
+                    observer = None
+                    errors.append("audit_sink_failure")
+                    events.append(AuditEvent(stage="audit_sink_failure", attempt=attempts,
+                        detail={"message": "Observer disabled; retained audit log remains available."}))
 
         def result(status, invoice=None, dlq_path=None):
             return ExtractionResult(execution_status=status, validated_data=invoice,
