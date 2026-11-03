@@ -150,6 +150,46 @@ case added after correction). Raw captured output: docs/step3_before.txt and
 step3_after.txt. Source diff: docs/step3_refactor.diff. Details and limits:
 docs/step3_verification.md. No paid API calls were made.
 
-Step 3 code/audit complete in assistant environment. John's review of these
-findings and the 51-test Dell verification remain pending. Step 4 UI, Step 5
+Step 3 code/audit complete. John's screenshot confirms 51 passed in 2.35s on
+Dell, successful Attempt 2 reflection and DLQ after 4 attempts with a saved file.
+His review of the findings remains pending. Step 4 UI, Step 5
 expanded project QA, Step 6 container execution and final video remain pending.
+
+## Step 4 - interactive web interface
+
+Actual user instruction: **"Proceed with Step 4."** The original assignment and
+verified Step 3 pipeline were the context; no separate AI service was invoked.
+ChatGPT/Codex generated src/app.py, src/static/index.html, app.css, app.js and
+21 HTTP integration tests in tests/test_web.py. The existing audited engine
+was reused without changing its acceptance or retry rules.
+
+Implemented upload PDF/HTML/text or pasted HTML/text; reflection toggle;
+source/validated JSON side by side; streamed audit events including field errors
+and exact corrective prompts; reconciliation status and Decimal differences;
+offline reflection, heuristic and DLQ simulations; accepted JSON/audit downloads.
+The failure button is always an explicit offline simulation against the sample.
+
+Design choices: default offline mode; fixed fixtures restricted to bundled
+source content so they cannot misrepresent arbitrary-document extraction; live
+mode requires a server key and explicit charge acknowledgement; no browser keys.
+Bound actual upload bytes, reject bad source before calling a provider, render
+untrusted text using textContent, enforce same-origin browser requests and local
+hostnames, and close per-request providers on completion/cancellation.
+
+During implementation an upload-limit test initially received 400, not the
+expected 413: a single oversized form field hit the parser's 1 MB field limit
+before the whole-request limit. The final test streams a multipart file across
+the 6 MB request boundary and verifies the actual body-limit path. BodyTooLarge
+uses HTTPException so request parsing preserves the intended 413 status. This
+is Step 4 development evidence, not an invented Step 3 baseline finding.
+
+Measured final results are in docs/step4_test_results.txt: 72 total passing
+cases (51 earlier + 21 HTTP cases). node --check passed for browser JavaScript;
+lockfile and whitespace checks passed. No actual live API calls were made.
+The live-route wiring test injects a fixture provider and is labeled offline.
+
+Visual browser verification could not finish in the assistant environment;
+no screenshot, confirmed responsive layout or successful live extraction is
+claimed. Dell visual verification is pending. See docs/step4_walkthrough.md
+for commands, exact expected outcomes and remaining scope. Step 5 expanded QA,
+Step 6 Docker and the final timed video are still pending.

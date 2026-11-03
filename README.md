@@ -4,16 +4,14 @@ John Nelson - AD 331 Artificial Intelligence - Week 4 hands-on assignment.
 
 Commercial invoice extraction with Pydantic v2, native OpenAI Structured
 Outputs, bounded reflection retries, heuristic repair, and dead-letter queue
-review. **Current milestone: Step 3 audit and corrections complete offline.**
-The provider adapter, document ingestion, reflection/repair/DLQ pipeline, CLI and
-synthetic samples are implemented and smoke-tested offline. Live OpenAI calls,
-the web UI, full QA, and Docker deployment remain unverified or unimplemented.
-`src/app.py` remains an explicit Step 4 placeholder.
+review. **Current milestone: Step 4 web interface implemented and HTTP-tested.**
+The provider adapter, ingestion, reflection/repair/DLQ pipeline, CLI, web UI and
+synthetic samples are implemented. All 72 current tests pass offline. Dell browser
+verification, live extraction quality, expanded QA, Docker and video remain pending.
 
 ## Architecture and data flow
 
-This diagram describes the pipeline. CLI output supplies the current display;
-the interactive UI will be added in Step 4.
+The CLI and interactive workbench use the same audited validation pipeline.
 
 ```mermaid
 flowchart TD
@@ -103,6 +101,17 @@ JSON object mode alone will not be represented as constrained schema decoding.
 Available now:
 
 ```powershell
+uv run uvicorn src.app:app --host 127.0.0.1 --port 8001
+```
+
+Open http://127.0.0.1:8001 in Edge or Chrome. Keep the terminal open; Ctrl+C
+stops the server. Click **Load sample**, then **Run extraction**. Offline mode
+is the default and makes no API calls. For the full control-by-control guide,
+see [step4_walkthrough.md](docs/step4_walkthrough.md).
+
+Other checks:
+
+```powershell
 uv run pytest -v
 uv run python -c "from src.schemas import InvoiceExtraction; print(InvoiceExtraction.model_json_schema())"
 ```
@@ -142,8 +151,15 @@ removed without executing code, fetching URLs, or treating that removal as a
 prompt-injection security guarantee. Native decoding uses `json_schema` and
 `strict: true`; provider wire models remain separate from business validators.
 
-The web application command and Docker instructions will be added when those
-features exist. See [assignment_progress.md](docs/assignment_progress.md)
+The workbench streams source text, audit events and final results. It supports
+PDF/HTML/TXT upload or pasted text/HTML, reflection on/off, side-by-side source
+and JSON, monetary reconciliation, exact correction prompts, and an offline
+**Simulate Edge Case Failure** button. JSON and audit downloads are available.
+Offline fixtures accept only the bundled sample; your own documents require
+explicit live mode and API-charge acknowledgement. Configure keys only on the
+server, never in browser fields. See the walkthrough for limits and live setup.
+
+Docker instructions will be added in Step 6. See [assignment_progress.md](docs/assignment_progress.md)
 for the full rubric mapping and [step1_verification.md](docs/step1_verification.md)
 for the verified Step 1 checks on Dell.
 
@@ -164,5 +180,8 @@ verification: **51 passed in 1.32s**, including an additional long-document retr
 check. See [step3_verification.md](docs/step3_verification.md) for evidence,
 limitations and Dell commands, and [step3_refactor.diff](docs/step3_refactor.diff)
 for the source changes. John verified Step 2's 44 tests, reflection/DLQ paths and
-warning-free PDF parsing on the Dell. Step 3 Dell verification, the web UI, live
-provider quality, expanded QA, deployment and final video remain pending.
+warning-free PDF parsing on the Dell. Step 3 is also verified on Dell: 51 passed in 2.35s, with expected reflection/DLQ
+results. Step 4 adds 21 passing HTTP integration cases. Final output is in
+[step4_test_results.txt](docs/step4_test_results.txt). Browser JavaScript passes
+syntax checking; visual verification on Dell, live provider quality, expanded
+QA, deployment and final video remain pending.

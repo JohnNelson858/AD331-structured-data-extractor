@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SchemaExtractor · John Nelson</title><link rel="stylesheet" href="/static/app.css"><script src="/static/app.js" defer></script></head>
+<body>
+<header class="topbar"><a class="brand" href="/" aria-label="SchemaExtractor home"><span class="brand-icon">{ }</span>SchemaExtractor<span class="brand-tag">WORKBENCH</span></a><span class="owner">John Nelson <span class="divider">/</span> AD 331</span></header>
+<div class="workspace">
+<aside class="sidebar">
+ <div class="eyebrow">EXTRACTION CONTROLS</div>
+ <form id="extract-form">
+ <label for="mode">Execution mode</label><select id="mode"><option value="offline">Offline sample demo · no API cost</option><option value="live" disabled>Live OpenAI · server key required</option></select>
+ <p class="field-note" id="mode-note">Fixed sample responses demonstrate the pipeline. Your own documents require live extraction.</p>
+ <div id="live-confirm" hidden><label class="check"><input type="checkbox" id="confirm-live">I authorize this run’s separately billed API calls.</label><p class="field-note">Up to 4 calls per run. Credentials stay on the server.</p></div>
+ <div class="control-heading"><label>Document input</label><button type="button" class="text-button" id="load-sample">Load sample</button></div>
+ <div class="tabs" role="tablist" aria-label="Document input"><button type="button" role="tab" id="paste-tab" aria-selected="true" aria-controls="paste-panel">Paste text / HTML</button><button type="button" role="tab" id="upload-tab" aria-selected="false" aria-controls="upload-panel">Upload file</button></div>
+ <div id="paste-panel" role="tabpanel" aria-labelledby="paste-tab"><label class="sr-only" for="document">Document text or HTML</label><textarea id="document" rows="10" placeholder="Load the sample invoice, or paste your document for live extraction…" maxlength="1000000"></textarea><label class="small-label" for="input-kind">Pasted format</label><select id="input-kind"><option value="text">Plain text</option><option value="html">Raw HTML</option></select></div>
+ <div id="upload-panel" role="tabpanel" aria-labelledby="upload-tab" hidden><label class="upload-box" for="file"><span class="upload-icon">↑</span><strong>Choose a document</strong><span>PDF, HTML, or UTF-8 text · up to 5 MB</span><input id="file" type="file" accept=".pdf,.html,.htm,.txt"></label><p class="field-note">PDFs need a text layer; scanned pages require OCR first.</p><a class="sample-link" href="/samples/invoice_messy.pdf" download>Download sample PDF ↓</a></div>
+ <div id="scenario-control"><label for="scenario">Sample scenario</label><select id="scenario"><option value="success">Clean extraction · attempt 1</option><option value="reflection">Incorrect total → reflection repair</option><option value="heuristic">JSON fences → heuristic repair</option></select></div>
+ <div class="reflection-control"><label class="check"><input id="reflection" type="checkbox" checked>Reflection self-correction</label><p class="field-note">On: 1 initial attempt + up to 3 retries.<br>Off: one attempt, then heuristic repair or DLQ.</p></div>
+ <button id="run" class="button primary" type="submit">Run extraction <span>→</span></button>
+ <button id="simulate" class="button secondary" type="button">Simulate Edge Case Failure</button>
+ <p class="field-note">Failure simulation always uses the offline sample. It writes a local DLQ record for human review.</p>
+ </form>
+ <div class="sidebar-footer"><span class="dot"></span>Local workbench<span>Schema v1.0.0</span></div>
+</aside>
+<main>
+ <div class="heading-row"><div><div class="eyebrow">RESILIENT DOCUMENT PIPELINE</div><h1>From messy input.<br><span>To validated records.</span></h1><p class="intro">Inspect every extraction, correction, and reconciliation.</p></div><span id="mode-badge" class="pill neutral">OFFLINE DEMO</span></div>
+ <div class="pipeline" aria-label="Pipeline stages"><span>01 <b>Ingest</b></span><i>→</i><span>02 <b>Constrain</b></span><i>→</i><span>03 <b>Validate</b></span><i>→</i><span>04 <b>Repair / review</b></span></div>
+ <div id="message" class="notice" role="status" aria-live="polite">Start with <strong>Load sample</strong>, then run an extraction. Offline demos make no API calls.</div>
+ <div class="metrics"><div class="metric"><span>EXECUTION STATUS</span><strong id="status">Ready</strong></div><div class="metric"><span>PROVIDER ATTEMPTS</span><strong id="attempts">—</strong></div><div class="metric"><span>RECONCILIATION</span><strong id="reconciliation">Awaiting validation</strong></div></div>
+ <section class="document-grid" aria-label="Source and extraction comparison">
+ <article class="panel"><div class="panel-heading"><h2>Source document</h2><span id="source-kind" class="subtle">NORMALIZED TEXT</span></div><pre id="source" class="document-text">Your document’s extracted text will appear here.
+
+Uploaded HTML is displayed as text, never executed.</pre><div class="panel-footer" id="source-meta">PDF · HTML · text</div></article>
+ <article class="panel"><div class="panel-heading"><h2>Validated record</h2><button class="text-button" id="download-json" disabled>Download JSON ↓</button></div><pre id="json" class="json-output">No accepted record yet.
+
+Only records passing the full Pydantic schema
+and monetary reconciliation appear here.</pre><div class="panel-footer" id="result-meta">Strict schema + cross-field validation</div></article>
+ </section>
+ <section id="reconciliation-detail" class="reconcile-panel" hidden><div><div class="eyebrow">RECONCILIATION REPORT</div><h2 id="equation"></h2></div><div id="checks"></div></section>
+ <section id="dlq-panel" class="dlq-panel" hidden><h2>Routed for human review</h2><p>The record was not accepted. The original failure and source excerpt were saved locally.</p><code id="dlq-path"></code></section>
+ <section class="panel audit-panel"><div class="panel-heading"><div><h2>Execution audit</h2><p>Live stage events, validation errors, and exact corrective prompts.</p></div><button id="download-audit" class="text-button" disabled>Download audit ↓</button></div><div id="audit-empty" class="empty-audit"><span>≡</span><p>Every step leaves a trace.</p><small>Run the pipeline to inspect the complete audit trail.</small></div><div id="audit-log" class="audit-log" aria-live="polite"></div></section>
+ <footer class="main-footer"><span>Pydantic v2 · native structured outputs · bounded recovery</span><span>John Nelson / AD 331</span></footer>
+</main></div>
+</body></html>

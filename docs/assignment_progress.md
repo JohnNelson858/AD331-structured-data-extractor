@@ -1,7 +1,8 @@
 # Assignment and rubric tracking
 
 The assignment has Parts 1-7 plus the Part 8 rubric. Part 4 contains the six
-implementation steps. Steps 1-3 code and audit are delivered; Step 3 Dell verification is pending.
+implementation steps. Steps 1-3 are verified on Dell. Step 4 UI and HTTP checks are implemented;
+Dell browser verification is pending.
 
 | Rubric criterion | Evidence / planned check | Current status |
 | --- | --- | --- |
@@ -9,8 +10,8 @@ implementation steps. Steps 1-3 code and audit are delivered; Step 3 Dell verifi
 | 2. Native strict decoding and messy PDF/HTML ingestion (20) | Step 2 engine, source samples, real SDK request under MockTransport | Baseline implemented; live provider verification pending |
 | 3. Reflection errors, exact bounds/backoff, json_repair and durable DLQ (20) | Step 2 baseline and smoke tests | Step 3 audited; 51 tests pass offline; Step 5 expanded QA pending |
 | 4. Actual prompt/baseline and at least two genuine corrected findings (15) | ai_prompt_log.md; preserved baseline; diff + regression evidence | Two genuine engine findings corrected; before/after results and source diff recorded |
-| 5. At least five tests covering golden document, rejection, reconciliation, Attempt 2 recovery and three-retry DLQ (10) | tests/test_extraction.py and tests/test_fallbacks.py | 51 schema/baseline/audit tests pass; required Step 5 test organization and expanded QA pending |
-| 6. Responsive UI with side-by-side source/JSON, badge, events/prompts and failure button (15, shared with video) | Step 4 UI and browser verification | Pending |
+| 5. At least five tests covering golden document, rejection, reconciliation, Attempt 2 recovery and three-retry DLQ (10) | tests/test_extraction.py and tests/test_fallbacks.py | 72 schema/baseline/audit/HTTP tests pass; Step 5 organization and expanded QA pending |
+| 6. Responsive UI with side-by-side source/JSON, badge, events/prompts and failure button (15, shared with video) | src/app.py, src/static, 21 HTTP integration cases | Implemented; Dell browser verification pending |
 | 6. Webcam + screen, video 5:00-7:00, live success/reflection/DLQ and pytest | Timed narrative after working app, actual saved MP4 | Pending |
 
 ## Six implementation steps
@@ -21,8 +22,10 @@ implementation steps. Steps 1-3 code and audit are delivered; Step 3 Dell verifi
 - [x] Step 2: generate and preserve baseline provider engine, ingestion, and recovery.
 - [x] Step 2: Dell 44 tests pass; reflection and DLQ verified; PDF warning resolved.
 - [x] Step 3: audit two legitimate engine flaws and verify corrections offline.
-- [ ] Step 3: student reviews findings and verifies 51 tests on Dell.
-- [ ] Step 4: build and verify interactive web UI.
+- [x] Step 3: Dell screenshot confirms 51 passed in 2.35s, reflection on attempt 2, and DLQ after 4 attempts.
+- [ ] Student review of the recorded audit findings.
+- [x] Step 4: implement UI, streaming API and HTTP integration checks.
+- [ ] Step 4: verify page and controls in Dell browser.
 - [ ] Step 5: complete structured QA with all required success/failure paths.
 - [ ] Step 6: Docker build and actual end-to-end container demo (local option).
 

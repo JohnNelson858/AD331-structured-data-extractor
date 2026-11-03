@@ -66,7 +66,8 @@ it from blocking the event loop. This is an in-process integrity boundary for
 cooperative UI consumers, not a sandbox against malicious Python code.
 
 John's latest screenshot confirms the refreshed PDF now parses without the
-previous startxref warning on the Dell. Step 3's 51-test Dell run remains pending.
+previous startxref warning on the Dell. John's next screenshot confirms 51 passed in 2.35s on Dell, Attempt 2 reflection
+with one error and reconciled=true, and DLQ after 4 attempts with a saved path.
 
 ## Dell verification commands
 
