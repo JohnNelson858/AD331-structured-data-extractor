@@ -252,3 +252,33 @@ event loop can initialize/run/close under the guard. Result here: **111 passed
 in 10.72s** on Linux, saved in docs/step5_windows_guard_fix_results.txt. Actual
 Dell re-verification remains pending. See docs/step5_windows_guard_fix.md.
 This is a genuine portability correction; no Windows pass is fabricated.
+
+## Step 6 - local Docker deployment preparation
+
+John first confirmed **111 passed in 12.80 seconds** on Dell, restarted on port
+8001, and reported the app looked good. Actual request: **"All looks good.
+Proceed with Step 6."** ChatGPT/Codex generated Dockerfile, default offline
+Compose, optional live secret override, an allowlisted .dockerignore, health/DLQ
+inspection helpers and an offline HTTP/persistence verifier.
+
+The multi-stage image installs locked runtime dependencies, runs non-root,
+exposes only local host port 8001, and writes DLQ records to a named volume.
+The base Compose explicitly clears key/key-file settings; credentials are not
+required. A separate opt-in file mounts .secrets/openai_api_key.txt. Key-file
+reading supports Windows BOM, safe startup errors and explicit API-key argument
+precedence; no key is exposed in config responses. The app now honors DLQ_DIR,
+which was previously listed in the example but ignored in create_app.
+
+Seven configuration integration cases verify actual DLQ routing/path precedence,
+secret-file read/non-exposure, missing/empty/invalid encoding handling and explicit
+offline configuration. **118 passed in 10.83s** here; raw output in
+docs/step6_test_results.txt. Compilation, lock and whitespace checks passed;
+Compose YAML was parsed and inspected. No dependency change or paid API call.
+
+Docker is not installed in the assistant workspace (docker: command not found).
+No image build, Compose runtime validation or persistent-volume pass is claimed.
+The Dell verifier is prepared to exercise actual container PDF/HTML, reflection,
+reflection-off, heuristic and hard-DLQ routes, inspect the saved disk record,
+force container recreation and compare its hash. Its execution remains pending.
+See docs/step6_docker.md. The final narration will reflect actual verified
+results after this run, live model verification and student review.

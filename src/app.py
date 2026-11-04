@@ -62,8 +62,16 @@ def create_app(*, dlq_dir=None, api_key=None, model=None, provider_factory=None)
     if api_key is None:
         load_dotenv(ROOT / ".env", override=False)
         api_key = os.getenv("OPENAI_API_KEY", "")
+        key_file = os.getenv("OPENAI_API_KEY_FILE", "").strip()
+        if key_file:
+            try:
+                api_key = Path(key_file).read_text(encoding="utf-8-sig").strip()
+            except (OSError, UnicodeError):
+                raise RuntimeError("Configured API key file could not be read.") from None
+            if not api_key:
+                raise RuntimeError("Configured API key file is empty.")
     model = model or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-    dlq_dir = Path(dlq_dir) if dlq_dir is not None else ROOT / "runtime/dlq"
+    dlq_dir = Path(dlq_dir) if dlq_dir is not None else Path(os.getenv("DLQ_DIR") or ROOT / "runtime/dlq")
     app = FastAPI(title="SchemaExtractor", version="0.2.0", docs_url=None, redoc_url=None)
     app.add_middleware(BodyLimitMiddleware)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost", "[::1]", "testserver"])

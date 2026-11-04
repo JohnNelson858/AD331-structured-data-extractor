@@ -54,3 +54,9 @@ uv run uvicorn src.app:app --host 127.0.0.1 --port 8001
 Primary Python references:
 - https://docs.python.org/3.11/library/socket.html#socket.socketpair
 - https://github.com/python/cpython/blob/3.11/Lib/asyncio/proactor_events.py
+
+## Subsequent Dell confirmation
+
+John reported **all 111 passed in 12.80 seconds**, then restarted the app on
+port 8001 and confirmed the page looked good. The Windows guard correction is
+therefore verified on his Dell. Step 6 adds separate configuration tests.

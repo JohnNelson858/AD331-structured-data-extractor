@@ -1,0 +1,18 @@
+# Allowlist: credentials, host virtualenv, runtime records and .git stay outside.
+**
+!Dockerfile
+!pyproject.toml
+!uv.lock
+!src/
+!src/**
+!samples/
+!samples/**
+!scripts/
+!scripts/container_healthcheck.py
+!scripts/inspect_dlq.py
+# Even a misplaced credential inside an allowed folder must stay out.
+**/.env
+**/.env.*
+**/.secrets/**
+**/__pycache__/**
+**/*.py[cod]

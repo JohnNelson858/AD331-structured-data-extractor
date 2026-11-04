@@ -1,0 +1,30 @@
+name: ad331-structured-data-extractor
+services:
+  extractor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ad331-structured-data-extractor:local
+    ports:
+      - "127.0.0.1:8001:8000"
+    environment:
+      # Explicit empty values keep the default demo offline even if .env exists.
+      OPENAI_API_KEY: ""
+      OPENAI_API_KEY_FILE: ""
+      OPENAI_MODEL: gpt-4o-mini
+      DLQ_DIR: /app/runtime/dlq
+    volumes:
+      - extractor_dlq:/app/runtime/dlq
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    stop_grace_period: 15s
+    restart: "no"
+volumes:
+  extractor_dlq:

@@ -4,11 +4,11 @@ John Nelson - AD 331 Artificial Intelligence - Week 4 hands-on assignment.
 
 Commercial invoice extraction with Pydantic v2, native OpenAI Structured
 Outputs, bounded reflection retries, heuristic repair, and dead-letter queue
-review. **Current milestone: Step 5 QA complete offline; Dell test run pending.**
+review. **Current milestone: Step 6 Docker files ready; Dell container verification pending.**
 The provider adapter, ingestion, reflection/repair/DLQ pipeline, CLI, web UI and
-synthetic samples are implemented. All 111 current tests pass offline. Main UI
-flows are verified on the Dell. The updated Dell test run, actual live extraction,
-Docker and final video remain pending.
+synthetic samples are implemented. All 118 current tests pass offline. Main UI
+flows and Step 5 are verified on Dell (111 passed in 12.80s). The new 118-test
+Dell run, actual Docker build/persistence, live extraction and final video remain pending.
 
 ## Architecture and data flow
 
@@ -162,7 +162,8 @@ Offline fixtures accept only the bundled sample; your own documents require
 explicit live mode and API-charge acknowledgement. Configure keys only on the
 server, never in browser fields. See the walkthrough for limits and live setup.
 
-Docker instructions will be added in Step 6. See [assignment_progress.md](docs/assignment_progress.md)
+Docker instructions are in [step6_docker.md](docs/step6_docker.md).
+Stop the native server before the Docker service takes port 8001. See [assignment_progress.md](docs/assignment_progress.md)
 for the full rubric mapping and [step1_verification.md](docs/step1_verification.md)
 for the verified Step 1 checks on Dell.
 
@@ -198,8 +199,8 @@ uv run pytest -v
 ```
 
 Initial Step 5 result: **108 passed in 10.81s** on Linux. After fixing a
-Windows test-guard incompatibility, **111 passed in 10.72s** here; Dell
-verification is pending. See [step5_windows_guard_fix.md](docs/step5_windows_guard_fix.md).
+Windows test-guard incompatibility, **111 passed in 10.72s** here and John
+confirmed **111 passed in 12.80s** on Dell. See [step5_windows_guard_fix.md](docs/step5_windows_guard_fix.md).
 The default suite blocks real HTTPX transports; no key or API credits are used.
 SDK calls use MockTransport, and web tests use in-process ASGITransport. These
 checks verify integration and validation behavior, not live extraction quality.
@@ -218,3 +219,43 @@ concurrent requests and cancellation. Tests found and corrected missing
 validation-retry backoff; the before/after results and source diff are recorded.
 See [step5_verification.md](docs/step5_verification.md) for the full mapping,
 measured evidence, Dell UI verification and remaining deployment/video work.
+
+
+## Local container deployment (Step 6)
+
+Start Docker Desktop (Linux/WSL 2 engine) and stop the native Uvicorn process
+with Ctrl+C. From this repository folder:
+
+```powershell
+docker compose config --quiet
+docker compose up --build -d --wait --wait-timeout 120
+docker compose ps
+```
+
+Open http://127.0.0.1:8001. The default image needs no API key and runs the labeled
+offline sample demo. A non-root service writes failed records to a named Docker
+volume. Readiness probes use /health without provider calls. Then prove actual
+HTTP extraction/recovery and persistence across container recreation:
+
+```powershell
+uv run python scripts/verify_docker.py --check-persistence
+```
+
+The verifier performs six offline scenarios, reads the saved DLQ metadata in the
+container, recreates the service and compares the record hash. Its report is
+saved to ignored runtime/docker_verification.json. **This verifier has not yet
+been run against an actual Docker daemon**; the assistant environment has no
+Docker installation. Actual Dell build/runtime/persistence proof remains pending.
+
+Current Python verification: **118 passed in 10.83s**. Seven added configuration
+cases verify DLQ_DIR and optional key-file behavior. Docker Compose YAML parsing,
+Python compilation, lock and whitespace checks passed. See
+[step6_docker.md](docs/step6_docker.md) for the full guide, exact pending checks,
+shutdown/resume commands and optional live secret-file configuration. Provider
+credentials and host runtime files are excluded from the image build context.
+
+Stop with docker compose down; the named volume is retained. The optional
+[Docker live override](docker-compose.live.yml) mounts an ignored local API key
+file only when explicitly selected. The app still requires a live-mode choice
+and charge acknowledgement before billable extraction. Live quality and final
+video/submission remain separate work.
