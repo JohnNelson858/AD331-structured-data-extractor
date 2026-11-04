@@ -6,7 +6,7 @@ Commercial invoice extraction with Pydantic v2, native OpenAI Structured
 Outputs, bounded reflection retries, heuristic repair, and dead-letter queue
 review. **Current milestone: Step 5 QA complete offline; Dell test run pending.**
 The provider adapter, ingestion, reflection/repair/DLQ pipeline, CLI, web UI and
-synthetic samples are implemented. All 108 current tests pass offline. Main UI
+synthetic samples are implemented. All 111 current tests pass offline. Main UI
 flows are verified on the Dell. The updated Dell test run, actual live extraction,
 Docker and final video remain pending.
 
@@ -197,8 +197,10 @@ passing cases. Actual live provider quality, Docker and final video remain pendi
 uv run pytest -v
 ```
 
-Final Step 5 result: **108 passed in 10.81s** in the assistant environment.
-The default suite blocks real socket connections; no key or API credits are used.
+Initial Step 5 result: **108 passed in 10.81s** on Linux. After fixing a
+Windows test-guard incompatibility, **111 passed in 10.72s** here; Dell
+verification is pending. See [step5_windows_guard_fix.md](docs/step5_windows_guard_fix.md).
+The default suite blocks real HTTPX transports; no key or API credits are used.
 SDK calls use MockTransport, and web tests use in-process ASGITransport. These
 checks verify integration and validation behavior, not live extraction quality.
 

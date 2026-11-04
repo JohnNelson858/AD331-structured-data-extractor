@@ -232,3 +232,23 @@ See docs/step5_verification.md for the five-case rubric map and complete scope.
 Step 5 Dell verification remains pending. Step 6 Docker, actual live provider
 verification, student policy/audit review and final recording/submission remain
 pending. The future narration will describe offline fault injection honestly.
+
+## Step 5 Dell follow-up - Windows event-loop guard incompatibility
+
+John supplied a screenshot of **46 passed, 16 warnings, 62 errors**, with the
+network-guard AssertionError and partially initialized ProactorEventLoop cleanup.
+He asked whether more detail or an application restart was needed. The app had
+not been restarted. The guard added in Step 5 patched all socket connects;
+that also interfered with the Windows event loop's internal local socketpair.
+The earlier Linux pass did not verify Windows compatibility.
+
+Correction: scope the offline test guard to HTTPX's default sync/async transport
+methods, before real provider HTTP networking. Do not patch OS socket methods.
+Existing MockTransport and ASGITransport still work. No app runtime code,
+Windows settings, dependencies or event-loop policy was changed.
+
+Three new tests assert real sync/async HTTP stays blocked and a fresh default
+event loop can initialize/run/close under the guard. Result here: **111 passed
+in 10.72s** on Linux, saved in docs/step5_windows_guard_fix_results.txt. Actual
+Dell re-verification remains pending. See docs/step5_windows_guard_fix.md.
+This is a genuine portability correction; no Windows pass is fabricated.

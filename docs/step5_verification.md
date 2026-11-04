@@ -7,7 +7,10 @@ John Nelson · AD 331 · November 3, 2026
 `uv run pytest -v`: **108 passed in 10.81s** in the assistant environment.
 Full captured output: [step5_test_results.txt](step5_test_results.txt).
 `uv lock --check` and `git diff --check` passed; dependencies did not change.
-Dell verification of this updated suite remains pending.
+John then observed 46 passed / 62 errors on Windows because the socket guard
+interfered with Proactor initialization. The corrected suite now has **111 passed
+in 10.72s** on Linux. See [step5_windows_guard_fix.md](step5_windows_guard_fix.md)
+and its captured results. Dell re-verification remains pending.
 
 This milestone adds 36 cases to the earlier 72. Tests simulate provider responses;
 none measures a live model's extraction quality or makes a paid API request.
@@ -54,7 +57,8 @@ tests/test_fallbacks.py, matching the assignment's requested layout.
 | test_web.py | 21 |
 | test_extraction.py | 10 |
 | test_fallbacks.py | 26 |
-| Total | 108 |
+| test_offline_guard.py (Windows portability follow-up) | 3 |
+| Current total | 111 |
 
 ## QA-discovered correction: reflection backoff
 
@@ -81,8 +85,10 @@ implementation gap found during Step 5, not a retroactive baseline audit claim.
 
 ## Offline execution safeguards
 
-The autouse fixture in tests/conftest.py blocks socket connect/connect_ex for
-all tests. HTTP tests use in-process ASGITransport and SDK tests use
+The initial socket-level guard proved incompatible with Windows Proactor
+initialization. The corrected autouse fixture in tests/conftest.py blocks the
+default sync/async HTTPX transport methods while leaving OS sockets untouched.
+HTTP tests use in-process ASGITransport and SDK tests use
 MockTransport; no real API key is needed. Targeted retry tests inject a virtual
 sleeper and assert the requested delays; existing end-to-end smoke/HTTP cases
 exercise real short validation pauses. The fixture is a guard against accidental
@@ -121,7 +127,7 @@ uv run pytest -v
 uv run uvicorn src.app:app --host 127.0.0.1 --port 8001
 ```
 
-Expected: 108 tests pass (timing varies). The final command restarts the web app
+Expected: 111 tests pass (timing varies). The final command restarts the web app
 with the updated backoff behavior. Open http://127.0.0.1:8001 and refresh the tab.
 Leave the server terminal running. For a focused instructor check, the new
 required cases can also be run with:
@@ -130,7 +136,7 @@ required cases can also be run with:
 uv run pytest tests/test_extraction.py tests/test_fallbacks.py -v
 ```
 
-That focused command has 36 cases; the full 108-case run is the normal check.
+That focused command has 36 cases; the full 111-case run is the normal check.
 All verification above is offline and uses no API credits.
 
 ## Remaining assignment work

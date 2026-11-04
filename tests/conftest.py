@@ -2,7 +2,7 @@
 import copy
 import json
 from pathlib import Path
-import socket
+import httpx
 
 import pytest
 
@@ -12,12 +12,21 @@ ROOT = Path(__file__).parents[1]
 
 
 @pytest.fixture(autouse=True)
-def no_real_network(monkeypatch):
-    """Mocks/ASGI are allowed; accidental real TCP API calls fail immediately."""
-    def blocked(*args, **kwargs):
-        raise AssertionError("Real network access is disabled in the offline QA suite")
-    monkeypatch.setattr(socket.socket, "connect", blocked)
-    monkeypatch.setattr(socket.socket, "connect_ex", blocked)
+def no_real_http(monkeypatch):
+    """Block real HTTPX transports, not OS sockets needed by Windows asyncio.
+
+    MockTransport and ASGITransport do not use these default transport methods.
+    The guard stops provider HTTP requests before DNS/TCP without interfering
+    with the Proactor event loop's local self-pipe/socketpair initialization.
+    """
+    def blocked_sync(*args, **kwargs):
+        raise AssertionError("Real HTTP access is disabled in the offline QA suite")
+
+    async def blocked_async(*args, **kwargs):
+        raise AssertionError("Real HTTP access is disabled in the offline QA suite")
+
+    monkeypatch.setattr(httpx.HTTPTransport, "handle_request", blocked_sync)
+    monkeypatch.setattr(httpx.AsyncHTTPTransport, "handle_async_request", blocked_async)
 
 
 @pytest.fixture
