@@ -282,3 +282,29 @@ reflection-off, heuristic and hard-DLQ routes, inspect the saved disk record,
 force container recreation and compare its hash. Its execution remains pending.
 See docs/step6_docker.md. The final narration will reflect actual verified
 results after this run, live model verification and student review.
+
+## Final repository checklist and video preparation
+
+Actual user instruction: **"Ok, now finalize the repository checklist and prepare
+the 5–7 minute video walkthrough narrative."** By this point John had supplied
+Docker build/healthy status and a successful six-scenario container verifier
+with identical DLQ bytes after recreation; reported **118 passed in 11.62s** on
+Dell; and supplied a LIVE OPENAI PDF screenshot showing Accepted, 1 attempt and
+reconciled total 1374.45 USD. These observations are consolidated in
+docs/final_verification.md. No additional paid request was made for this work.
+
+ChatGPT/Codex prepared docs/video_narration.txt (703 spoken words, target 6:30),
+docs/video_walkthrough.md (matching screen cues and timing), and
+docs/submission_template.md. README and assignment_progress.md now distinguish
+verified implementation/deployment/live integration from the still-pending
+student review, actual video recording, duration/visibility review, upload and
+Canvas submission. No video URL, actual duration, student review or completed
+submission is invented. The original implementation and measured logs remain
+preserved. This update changes documentation only, with no test/dependency or
+application changes requiring a new build.
+
+The narration explicitly discloses AI assistance and labels failure simulation
+as offline fixtures. It covers the two genuine engine findings instead of
+claiming nonexistent v1 syntax bugs, uses the actual one-plus-three retry
+convention, and does not equate schema/reconciliation success with factual truth.
+John should understand the referenced code and audit before presenting it.

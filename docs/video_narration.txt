@@ -1,0 +1,51 @@
+JOHN NELSON — AD 331 STRUCTURED DATA EXTRACTOR
+Target recording: 6 minutes 30 seconds. Read the paragraphs; do not read headings.
+Screen actions and rehearsal notes: docs/video_walkthrough.md.
+
+[0:00–1:00 — Architecture and schema]
+
+Hi, I'm John Nelson. This is my resilient invoice extraction project for AD 331. The goal is to turn messy documents into records that downstream software can safely validate and process.
+
+The repository separates schemas, ingestion, provider integration, extraction, recovery, and the web interface. The README diagram maps ingestion, decoding, validation, and recovery.
+
+In schemas.py, an invoice contains nested line items. Quantities must be positive integers. Invoice numbers follow a pattern, currencies use an allowed list, and money uses Decimal for accurate arithmetic. Before validators normalize explicit dates and currency-formatted amounts. The model validators check each line, the subtotal, tax, and grand total within a two-cent tolerance. Unknown fields and ambiguous dates are rejected.
+
+[1:00–2:25 — AI generation and audit]
+
+I used ChatGPT and Codex to help generate the baseline. The prompt log preserves the assignment context, generation instructions, and actual findings. The original baseline remains in Git, so the changes can be inspected.
+
+The first defect involved reflection context. A root-level reconciliation error has an empty field path. The baseline then kept only the start of the document, potentially dropping totals near the end. A currency error could also leave only the currency line. The correction preserves complete short documents and selects bounded header, footer, and relevant sections from longer ones. Incomplete excerpts are labeled explicitly.
+
+The second defect involved the audit callback. It received the same mutable event stored in the audit log, and an exception could crash extraction. The fix sends a deep copy, records a safe warning if the callback fails, and preserves validation and DLQ handling.
+
+The new regression checks produced five failures before correction. The saved before-and-after results document the fixes.
+
+[2:25–3:50 — Live extraction and interface]
+
+Now I'll upload the synthetic messy PDF. This run uses live OpenAI, with reflection disabled to limit it to one provider request. The key stays in a Docker-mounted secret file. I explicitly acknowledge the separate API charges before starting.
+
+The provider requests strict JSON Schema output. That constrains the response structure. Pydantic then applies the separate business rules, because correctly shaped JSON can still contain incorrect amounts.
+
+The interface displays the PDF's extracted text beside the validated record. Here, the invoice date is normalized, the amounts are decimal strings, and the grand total is thirteen hundred seventy-four dollars and forty-five cents. The reconciliation report shows the differences and tolerance, and the audit records the request, response, and validation result.
+
+This PDF has a text layer. Image-only scans require OCR before ingestion. Passing these checks establishes consistency; it does not prove that every extracted fact is correct.
+
+[3:50–5:45 — Reflection, heuristic repair, and DLQ]
+
+I'll switch to offline mode for the failure demonstrations. These are labeled fixture responses that exercise the real validation and recovery pipeline without additional API calls.
+
+First, I select the incorrect-total scenario and enable reflection. The initial response says fifteen hundred dollars, which fails reconciliation. The audit displays the Pydantic error and the corrective prompt containing source evidence, the failed response, and the precise validation feedback. Attempt two returns a valid record, and the status clearly identifies reflection recovery.
+
+Next, I trigger the edge-case failure button. The injected response remains invalid through the allowed attempts. Three retries means four calls total: one initial attempt and three additional attempts. Short backoff pauses and checks against the remaining execution budget keep retries bounded.
+
+The final result contains no accepted invoice. Instead, a DLQ record stores the failed payload, source hash, errors, and human-review flag. The Docker verification confirmed that this record survived container recreation with identical bytes.
+
+Finally, I disable reflection and select the JSON-fence scenario. Conservative heuristic repair removes the formatting wrapper and reruns full validation. It succeeds in one attempt. Missing required facts would still fail; the fallback cannot turn a partial object into an accepted invoice.
+
+[5:45–6:30 — QA, Docker proof, and close]
+
+I'll run the automated suite now. Its coverage includes golden PDF extraction, invalid quantities and totals, reconciliation failure, second-attempt recovery, and bounded DLQ routing, along with additional resilience checks.
+
+On my Dell, all one hundred eighteen tests passed. The automated tests use offline transports; the successful live extraction was verified separately.
+
+Docker Compose shows the service running with a health check. The saved verifier report confirms extraction, recovery, and persistent DLQ storage. This design gives downstream software an explicit accepted record or a visible failure requiring review. Thank you.

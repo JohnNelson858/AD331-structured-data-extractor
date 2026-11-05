@@ -147,3 +147,12 @@ application a tested live LLM extractor. Complete the student's policy/audit
 review, then prepare and record the 5-7 minute webcam/screen narrative, verify
 video duration/visibility, upload and submit the actual links. This milestone
 does not claim the whole assignment, deployment or video is complete.
+
+
+## Final Dell follow-up
+
+The Windows guard correction was verified with 111 passed in 12.80s. After the
+seven Docker configuration cases were added, John reported **118 passed in
+11.62s**. Actual Docker/persistence and one live PDF extraction were also
+verified separately; see final_verification.md. Earlier counts above are the
+preserved milestone measurements, not the current suite count.

@@ -1,67 +1,81 @@
-# Assignment and rubric tracking
+# Final repository and submission checklist
 
-The assignment has Parts 1-7 plus the Part 8 rubric. Part 4 contains the six
-implementation steps. Steps 1-4 are verified on Dell for the main desktop
-flows. Step 5 is verified on Dell (111 passed in 12.80s). Step 6 files and
-118 offline tests are ready; actual Dell container build/persistence are pending.
+John Nelson · AD 331 · finalized November 4, 2026 (Pacific)
 
-| Rubric criterion | Evidence / planned check | Current status |
-| --- | --- | --- |
-| 1. Nested Pydantic v2 models, regex/bounds/enums, monetary/date handling, reconciliation (20) | src/schemas.py; tests/test_schemas.py | 32 tests verified on Dell; monetary/date policy review pending |
-| 2. Native strict decoding and messy PDF/HTML ingestion (20) | Step 2 engine, source samples, real SDK request under MockTransport | Baseline implemented; live provider verification pending |
-| 3. Reflection errors, exact bounds/backoff, json_repair and durable DLQ (20) | Step 2 baseline and smoke tests | Audited; 118 offline tests pass, including bounded reflection backoff and failure paths |
-| 4. Actual prompt/baseline and at least two genuine corrected findings (15) | ai_prompt_log.md; preserved baseline; diff + regression evidence | Two genuine engine findings corrected; before/after results and source diff recorded |
-| 5. At least five tests covering golden document, rejection, reconciliation, Attempt 2 recovery and three-retry DLQ (10) | tests/test_extraction.py and tests/test_fallbacks.py | 118 offline tests pass; named required cases and mapping in docs/step5_verification.md; Dell run pending |
-| 6. Responsive UI with side-by-side source/JSON, badge, events/prompts and failure button (15, shared with video) | src/app.py, src/static, 21 HTTP integration cases | Main desktop flows verified on Dell: success, reflection, toggle, DLQ, heuristic, PDF/HTML upload |
-| 6. Webcam + screen, video 5:00-7:00, live success/reflection/DLQ and pytest | Timed narrative after working app, actual saved MP4 | Pending |
+The six implementation steps are complete and verified for this educational
+invoice domain. The repository is public. The remaining deliverables are the
+student's final understanding review and the recorded/uploaded/submitted video.
+A planned narration is not proof of video completion.
+
+## Rubric evidence
+
+| Category | Points | Repository / verification evidence | Status |
+| --- | ---: | --- | --- |
+| Schema architecture | 20 | src/schemas.py; nested LineItem/InvoiceExtraction; v2 field/model validators; regex, enum, strict quantities, Decimal money, date normalization and inclusive 0.02 reconciliation; tests/test_schemas.py | Implemented and tested; student policy review below |
+| Extraction and constrained decoding | 20 | src/ingestion.py and src/provider.py; real PDF/HTML parsers; native json_schema + strict=true; live PDF screenshot: Accepted, 1 attempt, total 1374.45 USD | Verified on Dell; one live success, not a general accuracy benchmark |
+| Reflection and fallback | 20 | src/extractor.py and src/fallback.py; exact errors, bounded excerpts/retries, deadline-aware backoff, conservative repair, explicit DLQ; Docker verifier confirms each route and persistent record | Verified with labeled offline fault injection and real engine/storage |
+| AI audit and human verification | 15 | ai_prompt_log.md; actual prompt context; immutable baseline; two genuine Step 3 findings, source diff and 5 pre-fix failed regressions | Audit evidence complete; student review below |
+| Automated QA | 10 | Required named cases in tests/test_extraction.py and tests/test_fallbacks.py; broader schema/web/config/guard coverage; John reports 118 passed in 11.62s on Dell | Verified |
+| UI, video and professionalism | 15 | src/static UI; source/JSON, reconciliation, events/errors/prompts, reflection toggle, failure control; Docker healthy and persistent DLQ; prepared timed narration and screen guide | Technical work verified; actual 5–7 minute webcam video pending |
+
+Points describe the assignment's categories, not an awarded or guaranteed score.
+Full observed results and limits: [final_verification.md](final_verification.md).
 
 ## Six implementation steps
 
-- [x] Step 1 code: project scaffolding and acceptance schema.
-- [x] Step 1: locked environment verified on Dell, 32 passed in 1.03s.
-- [ ] Step 1: student confirms review of the schema's monetary/date policy.
-- [x] Step 2: generate and preserve baseline provider engine, ingestion, and recovery.
-- [x] Step 2: Dell 44 tests pass; reflection and DLQ verified; PDF warning resolved.
-- [x] Step 3: audit two legitimate engine flaws and verify corrections offline.
-- [x] Step 3: Dell screenshot confirms 51 passed in 2.35s, reflection on attempt 2, and DLQ after 4 attempts.
-- [ ] Student review of the recorded audit findings.
-- [x] Step 4: implement UI, streaming API and HTTP integration checks.
-- [x] Step 4: main page and controls verified from Dell screenshots.
-- [x] Step 5: required five scenarios plus failure-path QA; 111 tests pass offline.
-- [x] Step 5: John reported 111 passed in 12.80s on Dell; app restarted successfully.
-- [x] Step 6: Dockerfile, offline Compose, optional secret override and persistence verifier prepared.
-- [ ] Step 6: actual Dell image build, healthy UI, verifier/persistence and updated 118-test run.
+- [x] Step 1: uv/Python project, lockfile and strict nested Pydantic v2 models.
+- [x] Step 2: preserved AI-generated provider/ingestion/extraction/recovery baseline.
+- [x] Step 3: two real engine defects reproduced, corrected and regression-tested.
+- [x] Step 4: main desktop UI flows verified on Dell, including PDF/HTML upload.
+- [x] Step 5: required five scenarios and additional failure-path QA; Windows guard corrected.
+- [x] Step 6: actual Docker build and healthy service on 127.0.0.1:8001 verified.
+- [x] Container verifier: six routes plus saved DLQ record; recreation retains identical bytes.
+- [x] Updated suite: John reported 118 passed in 11.62 seconds on Dell.
+- [x] Real OpenAI PDF extraction: Accepted, 1 attempt, reconciliation passes; reflection off.
 
-## Requirements to resolve explicitly during implementation
+## README and repository requirements
 
-- `max_retries=3` means at most 1 initial provider attempt + 3 corrective
-  attempts, unless assignment clarification requires a different convention.
-  `attempts_used` reports actual provider calls; tests prove the boundary.
-- Reflection disabled means no corrective model requests. The fallback still
-  applies full validation before returning any success.
-- A native strict provider may reject malformed syntax before returning text.
-  Controlled fault injection must be labeled as such; do not claim malformed
-  JSON came from a live strict provider when it did not.
-- Full JSON, captured validation traces, exact correction prompts and attempts
-  must be visible for the demo while avoiding credentials and private documents.
-- OCR-required PDFs must be handled explicitly. Never report empty extracted
-  text as successful document ingestion.
-- Heuristic repair must preserve failure visibility and revalidate all fields.
-  No invented missing values or all-None partial-success records.
-- Durable DLQ writes must use safe filenames, omit secrets, survive the chosen
-  container lifecycle, and handle write failures without false success.
-- README must end with a current Mermaid diagram, setup, schema specification,
-  app and test commands, audit summary, and honest deployment evidence.
+- [x] Original Mermaid architecture/data-flow diagram in README.
+- [x] uv setup with Python 3.11+, pyproject.toml and uv.lock.
+- [x] Schema field/type/normalization and cross-field policy specification.
+- [x] Exact commands for web app, tests and Docker alternative.
+- [x] AI audit summary with real provenance, defects, fixes and evidence.
+- [x] Synthetic messy PDF, HTML and text samples plus expected record.
+- [x] Default offline mode and explicitly acknowledged live requests.
+- [x] .env and .secrets excluded from Git/build context; file-based Docker secret option.
+- [x] Durable Docker DLQ named volume and verifier/health helpers.
+- [x] Timed video_narration.txt, video_walkthrough.md and submission_template.md.
+- [x] Final verification documentation distinguishes live results from injected fixtures.
 
-## Submission checklist (later)
+## Student review before recording
 
-- [ ] Public repository contains final code, lockfile, samples, README and audit log.
-- [ ] Local Docker execution shown, or cloud URL independently verified.
-- [ ] Video demonstrates successful extraction, reflection, durable DLQ and QA.
-- [ ] Actual video duration recorded as MM:SS and between 5:00 and 7:00.
-- [ ] Webcam visible throughout; YouTube Unlisted/Public.
-- [ ] Canvas submission includes John Nelson, repo, deployment note, video,
-  commercial invoice domain, and verified validation strategy.
+These require John's understanding and confirmation; the assistant cannot attest
+to an unseen personal review. Use the short understanding check in the walkthrough.
 
-The provided template says "Week 2" although this assignment is Week 4.
-Use the actual Canvas assignment title rather than carrying that typo forward.
+- [ ] I reviewed the supported money/date/currency policy and can explain Decimal,
+  explicit normalization, the 0.02 tolerance, unsupported scans and domain limits.
+- [ ] I reviewed the actual AI prompt log, both audit findings and before/after
+  code, and can explain the fixes in my own words.
+- [ ] I checked that any retained local live downloads open correctly under
+  runtime/live-verification. Those files remain excluded from the public repo.
+
+## Video execution and submission
+
+- [ ] Rehearsed the prepared narration with screen actions; target about 6:30.
+- [ ] Recorded actual duration between 5:00 and 7:00, including all transitions.
+- [ ] Webcam and screen visible throughout; code, JSON, errors and tests readable.
+- [ ] Showed architecture/schema and at least two actual AI audit corrections.
+- [ ] Demonstrated PDF/HTML ingestion and accepted validated record; live run labeled.
+- [ ] Demonstrated reflection, bounded hard failure/DLQ and automated pytest execution.
+- [ ] Showed Docker healthy status and verified persistent DLQ report.
+- [ ] Labeled recovery fixtures as offline; did not imply malformed fixture output
+  came from the native strict live provider.
+- [ ] Reviewed the complete video for audio, visibility, timing and credentials.
+- [ ] Uploaded as Unlisted/Public; verified the URL opens for a viewer.
+- [ ] Filled in actual YouTube URL and MM:SS in submission_template.md.
+- [ ] Submitted repository URL, Docker-demo note, video link, domain and strategy
+  in the correct Canvas assignment.
+
+Actual video URL: pending.
+Actual video duration: pending.
+Canvas submission: pending.

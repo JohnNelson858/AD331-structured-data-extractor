@@ -202,3 +202,20 @@ After actual Dell runtime/persistence evidence, finalize the rubric checklist,
 verify live extraction separately, complete the student's schema/audit review,
 and prepare the timed 5-7 minute video narration and submission links. This
 Docker preparation alone does not mark the whole assignment complete.
+
+
+## Subsequent Dell verification: complete
+
+John supplied a screenshot of the built image, newly created named DLQ volume,
+and healthy extractor service on 127.0.0.1:8001. He then ran the actual container
+verifier: uploaded PDF/HTML succeeded on attempt 1, reflection repaired on attempt
+2, reflection-disabled failure used one attempt, heuristic recovery used one,
+and hard failure reached DLQ after four. The persisted record was unchanged
+after a new container was created. Finally he reported **118 passed in 11.62s**.
+
+John configured a new expiring key locally using the optional secret override.
+The subsequent live PDF screenshot shows LIVE OPENAI, Accepted, 1 attempt, and
+successful reconciliation with total 1374.45 USD. No key was shared. This
+confirms one live integration success. See final_verification.md for scope;
+student review and final video/upload/submission are still pending. The initial
+pending statements above describe this milestone before those Dell checks.

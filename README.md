@@ -4,11 +4,17 @@ John Nelson - AD 331 Artificial Intelligence - Week 4 hands-on assignment.
 
 Commercial invoice extraction with Pydantic v2, native OpenAI Structured
 Outputs, bounded reflection retries, heuristic repair, and dead-letter queue
-review. **Current milestone: Step 6 Docker files ready; Dell container verification pending.**
-The provider adapter, ingestion, reflection/repair/DLQ pipeline, CLI, web UI and
-synthetic samples are implemented. All 118 current tests pass offline. Main UI
-flows and Step 5 are verified on Dell (111 passed in 12.80s). The new 118-test
-Dell run, actual Docker build/persistence, live extraction and final video remain pending.
+review. **Implementation, Docker persistence, and live extraction verified on Dell.**
+John reported **118 tests passed in 11.62 seconds**. The Docker verifier passed
+all six offline routes and confirmed identical DLQ bytes after container
+recreation. A separately verified live OpenAI PDF run was accepted on attempt 1.
+The final recording, student review and Canvas submission remain pending.
+
+Presentation materials: [read-aloud narration](docs/video_narration.txt),
+[timed screen walkthrough](docs/video_walkthrough.md),
+[final checklist](docs/assignment_progress.md), and
+[Canvas submission template](docs/submission_template.md).
+The narration targets 6:30; actual recorded duration must be checked.
 
 ## Architecture and data flow
 
@@ -145,8 +151,8 @@ DLQ records are written atomically under ignored `runtime/dlq` and include a
 source hash/excerpt, failed payload, versions, attempts, and errors. Common API
 key shapes are redacted, but this is not general PII anonymization. Use only the
 synthetic samples for recordings. A storage failure returns `DLQ_WRITE_FAILED`
-rather than claiming the record was saved. Local privacy and deployment-volume
-policies need review in subsequent steps.
+rather than claiming the record was saved. Docker volume persistence was verified on the Dell. The student should retain
+only appropriate documents and review records under the stated local policy.
 
 PDF input supports text layers, at most 5 MB and 10 pages. Pages without usable
 text are rejected with an OCR-required explanation. HTML scripts/styles are
@@ -189,7 +195,9 @@ results. Step 4 adds 21 passing HTTP integration cases. Final output is in
 [step4_test_results.txt](docs/step4_test_results.txt). Browser JavaScript passes
 syntax checking. John subsequently verified the main desktop UI flows on Dell,
 including PDF/HTML upload and all recovery controls. Step 5 expands QA to 108
-passing cases. Actual live provider quality, Docker and final video remain pending.
+passing cases initially; subsequent guard/configuration checks bring the total
+to 118. Actual Docker and one live PDF success are now verified on Dell; see
+[final_verification.md](docs/final_verification.md). The final video is pending.
 
 
 ## Automated QA: required cases and failure coverage
@@ -218,7 +226,8 @@ responses, heuristic rejection, DLQ storage failure, credential-shape redaction,
 concurrent requests and cancellation. Tests found and corrected missing
 validation-retry backoff; the before/after results and source diff are recorded.
 See [step5_verification.md](docs/step5_verification.md) for the full mapping,
-measured evidence, Dell UI verification and remaining deployment/video work.
+measured evidence and Dell UI verification. Current deployment/live results
+and remaining video work are consolidated in the final verification and checklist.
 
 
 ## Local container deployment (Step 6)
@@ -243,19 +252,40 @@ uv run python scripts/verify_docker.py --check-persistence
 
 The verifier performs six offline scenarios, reads the saved DLQ metadata in the
 container, recreates the service and compares the record hash. Its report is
-saved to ignored runtime/docker_verification.json. **This verifier has not yet
-been run against an actual Docker daemon**; the assistant environment has no
-Docker installation. Actual Dell build/runtime/persistence proof remains pending.
+saved to ignored runtime/docker_verification.json. **John ran it successfully
+on the Dell**: all six scenarios passed and a recreated container retained the
+same DLQ record bytes. The assistant workspace has no Docker daemon; this runtime
+verification is evidenced by John's supplied report screenshot.
 
-Current Python verification: **118 passed in 10.83s**. Seven added configuration
+Current Dell verification: **118 passed in 11.62s**, reported by John; the
+assistant run was 118 passed in 10.83s. Seven added configuration
 cases verify DLQ_DIR and optional key-file behavior. Docker Compose YAML parsing,
 Python compilation, lock and whitespace checks passed. See
-[step6_docker.md](docs/step6_docker.md) for the full guide, exact pending checks,
+[step6_docker.md](docs/step6_docker.md) for the full guide,
 shutdown/resume commands and optional live secret-file configuration. Provider
 credentials and host runtime files are excluded from the image build context.
 
 Stop with docker compose down; the named volume is retained. The optional
 [Docker live override](docker-compose.live.yml) mounts an ignored local API key
 file only when explicitly selected. The app still requires a live-mode choice
-and charge acknowledgement before billable extraction. Live quality and final
-video/submission remain separate work.
+and charge acknowledgement before billable extraction. John verified an actual
+OpenAI PDF extraction with reflection disabled: Accepted, 1 attempt, date
+2024-10-12, total 1374.45 USD, reconciliation within 0.02. This single success
+is not a broad accuracy guarantee. Final video/submission remain pending.
+
+
+## Video and final submission
+
+The [703-word narration](docs/video_narration.txt) targets a **6:30** presentation
+with five sections: schema/architecture, genuine AI audit, real PDF extraction,
+labeled offline reflection/DLQ/heuristic demonstrations, then pytest and Docker
+proof. Follow [video_walkthrough.md](docs/video_walkthrough.md) for screen cues,
+exact controls, rehearsal guidance and timing. Rehearsals can stay offline; a
+new live extraction is separately billed and requires explicit acknowledgement.
+
+Check off only work actually completed in
+[assignment_progress.md](docs/assignment_progress.md). Student review and the
+actual recording/upload/submission remain unchecked. Use
+[submission_template.md](docs/submission_template.md) after replacing the video
+URL and actual duration. The local Docker demo satisfies the selected deployment
+alternative; the instructor cannot access the Dell through a loopback URL.
